@@ -1,0 +1,23 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+
+    <!-- Schräge Plattform -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M10,70 L90,50 L95,55 L15,75 Z"/>
+
+    <!-- Ball (Kreis) -->
+    <path
+        android:fillColor="#C89B5C"
+        android:pathData="M35,35 A15,15 0 1,0 65,35 A15,15 0 1,0 35,35"
+        android:fillAlpha="1.0"/>
+
+    <!-- Lichtschein (leicht transparent) -->
+    <path
+        android:fillColor="#C89B5C"
+        android:fillAlpha="0.1"
+        android:pathData="M35,35 L90,50 L95,55 L40,40 Z"/>
+</vector>
