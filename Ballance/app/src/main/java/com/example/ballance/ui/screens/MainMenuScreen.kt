@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.runtime.*
@@ -40,23 +41,40 @@ fun MainMenuScreen(navController: NavController) {
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
 
-            // Musik AN/AUS IconButton oben rechts – jetzt größer
-            IconButton(
-                onClick = {
-                    MusicPlayer.toggle(context)
-                    isPlaying = MusicPlayer.isPlaying
-                },
+            // Lautsprecher- und Info-Button oben rechts – gleich groß (48.dp)
+            Row(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(16.dp)
-                    .size(56.dp) // 👈 hier die Größe angepasst
             ) {
-                Icon(
-                    imageVector = if (isPlaying) Icons.Filled.VolumeUp else Icons.Filled.VolumeOff,
-                    contentDescription = if (isPlaying) "Musik aus" else "Musik an",
-                    tint = Color.White,
-                    modifier = Modifier.fillMaxSize()
-                )
+                IconButton(
+                    onClick = {
+                        MusicPlayer.toggle(context)
+                        isPlaying = MusicPlayer.isPlaying
+                    },
+                    modifier = Modifier.size(48.dp) // 👈 kleiner als vorher
+                ) {
+                    Icon(
+                        imageVector = if (isPlaying) Icons.Filled.VolumeUp else Icons.Filled.VolumeOff,
+                        contentDescription = "Musik umschalten",
+                        tint = Color.White,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                IconButton(
+                    onClick = { navController.navigate(Screen.Info.route) },
+                    modifier = Modifier.size(48.dp) // 👈 größer als vorher
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Info,
+                        contentDescription = "Info",
+                        tint = Color.White,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
 
             Column(
