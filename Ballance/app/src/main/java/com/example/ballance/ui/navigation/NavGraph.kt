@@ -1,10 +1,13 @@
 package com.example.ballance.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.ballance.viewModels.GameViewModel
 import com.example.ballance.ui.screens.*
+import com.example.Ballance.ViewModels.MazeViewModel
 
 sealed class Screen(val route: String) {
     object MainMenu : Screen("main_menu")
@@ -21,13 +24,15 @@ fun AppNavHost(navController: NavHostController) {
             MainMenuScreen(navController)
         }
         composable(Screen.Game.route) {
-            GameScreen(navController)
+            val gameViewModel: GameViewModel = viewModel()
+            GameScreen(gameViewModel, navController)
         }
         composable(Screen.LevelSelect.route) {
             LevelSelectScreen(navController)
         }
         composable(Screen.Editor.route) {
-            EditorScreen(navController)
+            val mazeVm: MazeViewModel = viewModel()
+            EditorScreen(navController, mazeVm)
         }
         composable(Screen.Info.route) {
             InfoScreen(navController)
