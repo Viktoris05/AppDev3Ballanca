@@ -34,9 +34,11 @@ sealed class CellBehavior {
 
     /** Represents a finish tile: triggers an effect when reached. */
     object Finish : CellBehavior() {
+        var onVictoryCallback: (() -> Unit)? = null
+
         override fun onEnter(): (() -> Unit)? = {
-            // Placeholder for end-of-level logic
-            println("WOOOOOOOOOOOOOOOoooo") // Replace with real win logic
+            onVictoryCallback?.invoke()
         }
     }
+
 }
