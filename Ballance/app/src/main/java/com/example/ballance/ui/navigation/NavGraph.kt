@@ -7,7 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.ballance.viewModels.GameViewModel
 import com.example.ballance.ui.screens.*
-import com.example.ballance.ViewModels.MazeViewModel
+import com.example.ballance.viewModels.MazeViewModel
 
 sealed class Screen(val route: String) {
     object MainMenu : Screen("main_menu")

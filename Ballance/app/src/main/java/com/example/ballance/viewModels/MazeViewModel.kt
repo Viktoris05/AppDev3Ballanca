@@ -1,4 +1,4 @@
-package com.example.ballance.ViewModels
+package com.example.ballance.viewModels
 
 import android.content.Context
 import androidx.compose.runtime.MutableState
@@ -22,14 +22,14 @@ import kotlinx.serialization.json.Json
 class MazeViewModel : ViewModel() {
 
     /** Number of rows in the maze grid */
-    val rows = 15
+    val rows = 36
 
     /** Number of columns in the maze grid */
-    val cols = 15
+    val cols = 16
 
     /**
      * 2D grid of observable [CellType]s.
-     * Each cell is a [androidx.compose.runtime.MutableState], allowing fine-grained recomposition.
+     * Each cell is a [MutableState], allowing fine-grained recomposition.
      */
     var mazeGrid: Array<Array<MutableState<CellType>>> = Array(rows) {
         Array(cols) { mutableStateOf(CellType.EMPTY) }
@@ -55,7 +55,7 @@ class MazeViewModel : ViewModel() {
      * Converts the 2D grid of [MutableState<CellType>] into a serializable
      * 2D list of [CellType]s and writes it to a file named `"maze.json"`.
      *
-     * @param context The Android [android.content.Context], used to open the file.
+     * @param context The Android [Context], used to open the file.
      */
     fun saveMaze(context: Context) {
         val serializableGrid = mazeGrid.map { row ->

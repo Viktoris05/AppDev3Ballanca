@@ -22,7 +22,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     private val context = getApplication<Application>()
 
     // Maze grid stored as a 2D array of CellType
-    private var maze: Array<Array<CellType>> = Array(15) { Array(15) { CellType.EMPTY } }
+    private var maze: Array<Array<CellType>> = Array(36) { Array(16) { CellType.EMPTY } } //18:8 because the emulator uses that ratio (16:9 is the most common though)
 
     // Physics engine for ball motion
     private lateinit var physics: TiltGravityPhysics
@@ -45,13 +45,13 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         try {
             val json = context.openFileInput("maze.json").bufferedReader().readText()
             val list = Json.Default.decodeFromString<List<List<CellType>>>(json)
-            maze = Array(15) { r -> Array(15) { c -> list[r][c] } }
+            maze = Array(36) { r -> Array(16) { c -> list[r][c] } }
         } catch (e: Exception) {
             // Leave default empty maze on load failure
         }
 
         // Initialize ball state and physics engine
-        val cellSize = 70f
+        val cellSize = 66f
         physics = TiltGravityPhysics(ballRadius = cellSize / 2.5f)
         ballX = cellSize * (maze[0].size / 2)
         ballY = cellSize * (maze.size / 2)

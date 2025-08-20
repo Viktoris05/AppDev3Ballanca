@@ -22,7 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.ballance.physics.CellType
-import com.example.ballance.ViewModels.MazeViewModel
+import com.example.ballance.viewModels.MazeViewModel
 import com.example.ballance.MusicPlayer
 import com.example.ballance.ui.theme.accentColor
 

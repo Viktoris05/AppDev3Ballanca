@@ -13,7 +13,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.ballance.UserInterface.GameCanvas
+import com.example.ballance.ui.screens.utilities.GameCanvas
 import com.example.ballance.MusicPlayer
 import com.example.ballance.Utilities.TiltSensorHandler
 import com.example.ballance.ui.theme.accentColor
@@ -50,16 +50,16 @@ fun GameScreen(
 
     // Load maze and dimensions
     val maze = viewModel.getMaze()
-    val rows = maze[0].size
-    val cols = maze.size
-    val cellSize = 70f // size of each cell in pixels
+    val rows = maze.size
+    val cols = maze[0].size
+    val cellSize = 66f // size of each cell in pixels
     var velocityX = viewModel.getVelocityX()
     var velocityY = viewModel.getVelocityY()
     //test
     //test2
     // Track ball position in world-space pixels (stateful for Compose redraw)
-    var ballX by remember { mutableStateOf(cellSize * (cols / 2)) }
-    var ballY by remember { mutableStateOf(cellSize * (rows / 2)) }
+    var ballX by remember { mutableStateOf(cellSize * (rows / 2)) }
+    var ballY by remember { mutableStateOf(cellSize * (cols / 2)) }
 
     // Launch a coroutine that starts when this Composable is composed.
     // This will run our real-time physics update loop (60fps-like).
