@@ -55,8 +55,6 @@ fun GameScreen(
     val cellSize = 66f // size of each cell in pixels
     var velocityX = viewModel.getVelocityX()
     var velocityY = viewModel.getVelocityY()
-    //test
-    //test2
     // Track ball position in world-space pixels (stateful for Compose redraw)
     var ballX by remember { mutableStateOf(cellSize * (rows / 2)) }
     var ballY by remember { mutableStateOf(cellSize * (cols / 2)) }
@@ -156,10 +154,12 @@ fun GameScreen(
                     //debug values on screen
                     fun Float.format(digits: Int): String = "%.${digits}f".format(this)
 
-                    Text("ax: ${sensorHandler.tiltX.format(2)}", color = Color.White, fontSize = 14.sp)
-                    Text("ay: ${sensorHandler.tiltY.format(2)}", color = Color.White, fontSize = 14.sp)
-                    Text("vx: ${velocityX.format(2)}", color = Color.White, fontSize = 14.sp)
-                    Text("vy: ${velocityY.format(2)}", color = Color.White, fontSize = 14.sp)
+                    Text("ax: ${sensorHandler.tiltX.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+                    Text("ay: ${sensorHandler.tiltY.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+                    Text("vx: ${velocityX.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+                    Text("vy: ${velocityY.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+                    Text("xcor: ${ballX.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+                    Text("ycor: ${ballY.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
                 }
 
                 // "Back to Menu" button in lower-center

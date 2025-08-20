@@ -53,8 +53,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         // Initialize ball state and physics engine
         val cellSize = 66f
         physics = TiltGravityPhysics(ballRadius = cellSize / 2.5f)
-        ballX = cellSize * (maze[0].size / 2)
-        ballY = cellSize * (maze.size / 2)
+        ballX = cellSize * (maze.size / 2)
+        ballY = cellSize * (maze[0].size / 2)
     }
 
     /**
