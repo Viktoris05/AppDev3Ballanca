@@ -13,9 +13,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.Ballance.UserInterface.GameCanvas
+import com.example.ballance.UserInterface.GameCanvas
 import com.example.ballance.MusicPlayer
-import com.example.Ballance.Utilities.TiltSensorHandler
+import com.example.ballance.Utilities.TiltSensorHandler
 import com.example.ballance.ui.theme.accentColor
 import com.example.ballance.viewModels.GameViewModel
 
@@ -50,12 +50,13 @@ fun GameScreen(
 
     // Load maze and dimensions
     val maze = viewModel.getMaze()
-    val rows = maze.size
-    val cols = maze[0].size
+    val rows = maze[0].size
+    val cols = maze.size
     val cellSize = 70f // size of each cell in pixels
     var velocityX = viewModel.getVelocityX()
     var velocityY = viewModel.getVelocityY()
-
+    //test
+    //test2
     // Track ball position in world-space pixels (stateful for Compose redraw)
     var ballX by remember { mutableStateOf(cellSize * (cols / 2)) }
     var ballY by remember { mutableStateOf(cellSize * (rows / 2)) }

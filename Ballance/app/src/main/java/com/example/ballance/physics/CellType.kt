@@ -19,10 +19,10 @@ enum class CellType {
 }
 
 /**
- * Maps a [CellType] to its corresponding [com.example.Ballance.Physics.CellBehavior], defining how the tile behaves.
+ * Maps a [CellType] to its corresponding [com.example.ballance.Physics.CellBehavior], defining how the tile behaves.
  *
  * This allows rendering and logic code to remain independent of raw enum values,
- * and instead work with the polymorphic [com.example.Ballance.Physics.CellBehavior] interface.
+ * and instead work with the polymorphic [com.example.ballance.Physics.CellBehavior] interface.
  */
 fun CellType.toBehavior(): CellBehavior = when (this) {
     CellType.EMPTY -> CellBehavior.Empty

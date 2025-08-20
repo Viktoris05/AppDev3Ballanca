@@ -60,7 +60,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * Advances the simulation one step forward using the current tilt input.
      *
-     * Delegates to [com.example.Ballance.Physics.BaseMazePhysics.update], then updates the internal
+     * Delegates to [com.example.ballance.Physics.BaseMazePhysics.update], then updates the internal
      * position state. This method is called from the game loop.
      *
      * @param ax        X-axis tilt (accelerometer).

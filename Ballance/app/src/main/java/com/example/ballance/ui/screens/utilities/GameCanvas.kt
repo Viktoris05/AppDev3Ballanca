@@ -1,4 +1,4 @@
-package com.example.Ballance.UserInterface
+package com.example.ballance.UserInterface
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
 import com.example.ballance.physics.CellType
-import com.example.Ballance.UserInterface.Utilities.WorldToScreenMapper
+import com.example.ballance.UserInterface.Utilities.WorldToScreenMapper
 
 /**
  * Composable responsible for drawing the current state of the maze and ball.

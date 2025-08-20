@@ -1,4 +1,4 @@
-package com.example.Ballance.ViewModels
+package com.example.ballance.ViewModels
 
 import android.content.Context
 import androidx.compose.runtime.MutableState

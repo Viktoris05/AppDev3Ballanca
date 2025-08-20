@@ -1,4 +1,4 @@
-package com.example.Ballance.UserInterface.Utilities
+package com.example.ballance.UserInterface.Utilities
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size

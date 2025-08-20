@@ -1,4 +1,4 @@
-package com.example.Ballance.Utilities
+package com.example.ballance.Utilities
 
 import android.content.Context
 import android.hardware.Sensor
