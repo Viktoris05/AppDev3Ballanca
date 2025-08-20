@@ -80,7 +80,7 @@ fun MainMenuScreen(navController: NavController) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(24.dp),
+                    .padding(horizontal = 24.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -89,7 +89,6 @@ fun MainMenuScreen(navController: NavController) {
                     contentDescription = "Ballance Logo",
                     modifier = Modifier
                         .size(160.dp)
-                        .padding(bottom = 32.dp)
                 )
 
                 Text(
@@ -111,7 +110,7 @@ fun MainMenuScreen(navController: NavController) {
                         ) { append("ance") }
                     },
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(bottom = 48.dp)
+                    modifier = Modifier.padding(bottom = 10.dp)
                 )
 
                 MenuButton("Spiel Starten", accentColor) {
