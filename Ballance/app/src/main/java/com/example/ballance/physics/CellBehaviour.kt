@@ -41,4 +41,19 @@ sealed class CellBehavior {
         }
     }
 
+    /** Represents a slowdown tile: ball touching this tile will slow down significantly */
+    object Slowdown : CellBehavior() {
+
+    }
+
+    /** Represents a speedup tile: ball touching this tile will speed up significantly */
+    object Speedup : CellBehavior() {
+
+    }
+
+    /** Represents an imposter hole. If the ball falls into this hole the ball will respawn */
+    object Blackhole : CellBehavior() {
+
+    }
+
 }

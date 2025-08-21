@@ -25,7 +25,7 @@ import androidx.navigation.NavController
 import com.example.ballance.physics.CellType
 import com.example.ballance.viewModels.MazeViewModel
 import com.example.ballance.MusicPlayer
-import com.example.ballance.ui.theme.accentColor
+import com.example.ballance.ui.theme.*
 
 @Composable
 fun EditorScreen(
@@ -76,6 +76,64 @@ fun EditorScreen(
                     .fillMaxSize()
             ) {
 
+                // Tile selection buttons
+                Column {
+                    Button(
+                        onClick = { selectedType = CellType.EMPTY },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = accentColor,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Empty")
+                    }
+                    Button(
+                        onClick = { selectedType = CellType.WALL },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = accentColor,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Wall")
+                    }
+                    Button(
+                        onClick = { selectedType = CellType.FINISH },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = accentColor,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Finish")
+                    }
+                    Button(
+                        onClick = { selectedType = CellType.SLOWDOWN },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = accentColor,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Slowdown")
+                    }
+                    Button(
+                        onClick = { selectedType = CellType.SPEEDUP },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = accentColor,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Speedup")
+                    }
+                    Button(
+                        onClick = { selectedType = CellType.BLACKHOLE },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = accentColor,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Black Hole")
+                    }
+                }
+
                 // Maze grid display
                 for (row in 0 until viewModel.rows) {
                     Column(modifier = Modifier.horizontalScroll(horizontalScroll)) {
@@ -89,9 +147,11 @@ fun EditorScreen(
                                     .background(
                                         when (cellType) {
                                             CellType.EMPTY -> Color.White
-                                            CellType.WALL -> Color.Black
-                                            CellType.FINISH -> Color.Green
-                                            else -> Color.Magenta
+                                            CellType.WALL -> accentColor
+                                            CellType.FINISH -> finishColor
+                                            CellType.SLOWDOWN -> slowdownColor
+                                            CellType.SPEEDUP -> speedupColor
+                                            CellType.BLACKHOLE -> Color.Black
                                         }
                                     )
                                     .border(1.dp, Color.Gray)
@@ -103,29 +163,9 @@ fun EditorScreen(
                     }
                 }
 
-                // Tile selection buttons
-                Column {
-                    Button(onClick = { selectedType = CellType.EMPTY },colors = ButtonDefaults.buttonColors(
-                        containerColor = accentColor,
-                        contentColor = Color.White
-                    )) {
-                        Text("Empty")
-                    }
-                    Button(onClick = { selectedType = CellType.WALL },colors = ButtonDefaults.buttonColors(
-                        containerColor = accentColor,
-                        contentColor = Color.White
-                    )) {
-                        Text("Wall")
-                    }
-                    Button(onClick = { selectedType = CellType.FINISH },colors = ButtonDefaults.buttonColors(
-                        containerColor = accentColor,
-                        contentColor = Color.White
-                    )) {
-                        Text("Finish")
-                    }
 
-                    Spacer(Modifier.height(30.dp))
 
+                Column{
                     Button(
                         onClick = {
                             viewModel.saveMaze(context)
@@ -138,6 +178,8 @@ fun EditorScreen(
                         Text("Save Maze")
                     }
 
+                    Spacer(modifier = Modifier.size(5.dp))
+
                     Button(
                         onClick = {
                             viewModel.loadMaze(context)
@@ -149,6 +191,8 @@ fun EditorScreen(
                     ) {
                         Text("Load Maze")
                     }
+
+                    Spacer(modifier = Modifier.size(5.dp))
 
                     Button(
                         onClick = { navController.popBackStack() },
