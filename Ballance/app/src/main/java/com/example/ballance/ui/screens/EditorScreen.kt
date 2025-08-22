@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -22,7 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.ballance.physics.CellType
-import com.example.Ballance.ViewModels.MazeViewModel
+import com.example.ballance.viewModels.MazeViewModel
 import com.example.ballance.MusicPlayer
 import com.example.ballance.ui.theme.accentColor
 
@@ -68,45 +69,23 @@ fun EditorScreen(
             }
 
             // Maze editor UI
-            Column(
+            Row(
                 modifier = Modifier
                     .verticalScroll(verticalScroll)
                     .padding(8.dp)
+                    .fillMaxSize()
             ) {
-                // Tile selection buttons
-                Row {
-                    Button(onClick = { selectedType = CellType.EMPTY },colors = ButtonDefaults.buttonColors(
-                            containerColor = accentColor,
-                        contentColor = Color.White
-                    )) {
-                        Text("Empty")
-                    }
-                    Button(onClick = { selectedType = CellType.WALL },colors = ButtonDefaults.buttonColors(
-                        containerColor = accentColor,
-                        contentColor = Color.White
-                    )) {
-                        Text("Wall")
-                    }
-                    Button(onClick = { selectedType = CellType.FINISH },colors = ButtonDefaults.buttonColors(
-                        containerColor = accentColor,
-                        contentColor = Color.White
-                    )) {
-                        Text("Finish")
-                    }
-                }
-
-                Spacer(Modifier.height(16.dp))
 
                 // Maze grid display
                 for (row in 0 until viewModel.rows) {
-                    Row(modifier = Modifier.horizontalScroll(horizontalScroll)) {
+                    Column(modifier = Modifier.horizontalScroll(horizontalScroll)) {
                         for (col in 0 until viewModel.cols) {
                             val cellState = mazeGrid[row][col]
                             val cellType by cellState
 
                             Box(
                                 modifier = Modifier
-                                    .size(30.dp)
+                                    .size(19.dp)
                                     .background(
                                         when (cellType) {
                                             CellType.EMPTY -> Color.White
@@ -124,36 +103,65 @@ fun EditorScreen(
                     }
                 }
 
-                Spacer(Modifier.height(16.dp))
+                // Tile selection buttons
+                Column {
+                    Button(onClick = { selectedType = CellType.EMPTY },colors = ButtonDefaults.buttonColors(
+                        containerColor = accentColor,
+                        contentColor = Color.White
+                    )) {
+                        Text("Empty")
+                    }
+                    Button(onClick = { selectedType = CellType.WALL },colors = ButtonDefaults.buttonColors(
+                        containerColor = accentColor,
+                        contentColor = Color.White
+                    )) {
+                        Text("Wall")
+                    }
+                    Button(onClick = { selectedType = CellType.FINISH },colors = ButtonDefaults.buttonColors(
+                        containerColor = accentColor,
+                        contentColor = Color.White
+                    )) {
+                        Text("Finish")
+                    }
 
-                // Save/Load buttons
-                Button(onClick = {
-                    viewModel.saveMaze(context)
-                    Toast.makeText(context, "Maze saved!", Toast.LENGTH_SHORT).show()
-                },colors = ButtonDefaults.buttonColors(
-                    containerColor = accentColor,
-                    contentColor = Color.White
-                )) {
-                    Text("Save Maze")
-                }
+                    Spacer(Modifier.height(30.dp))
 
-                Button(onClick = {
-                    viewModel.loadMaze(context)
-                    Toast.makeText(context, "Maze loaded!", Toast.LENGTH_SHORT).show()
-                },colors = ButtonDefaults.buttonColors(
-                    containerColor = accentColor,
-                    contentColor = Color.White
-                )) {
-                    Text("Load Maze")
-                }
+                    Button(
+                        onClick = {
+                            viewModel.saveMaze(context)
+                            Toast.makeText(context, "Maze saved!", Toast.LENGTH_SHORT).show()
+                        }, colors = ButtonDefaults.buttonColors(
+                            containerColor = accentColor,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Save Maze")
+                    }
 
-                Button(onClick = { navController.popBackStack() },colors = ButtonDefaults.buttonColors(
-                    containerColor = accentColor,
-                    contentColor = Color.White
-                )) {
-                    Text("Back to Menu")
+                    Button(
+                        onClick = {
+                            viewModel.loadMaze(context)
+                            Toast.makeText(context, "Maze loaded!", Toast.LENGTH_SHORT).show()
+                        }, colors = ButtonDefaults.buttonColors(
+                            containerColor = accentColor,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Load Maze")
+                    }
+
+                    Button(
+                        onClick = { navController.popBackStack() },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = accentColor,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Back to Menu")
+                    }
                 }
             }
+
         }
     }
 }

@@ -13,9 +13,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.Ballance.UserInterface.GameCanvas
+import com.example.ballance.ui.screens.utilities.GameCanvas
 import com.example.ballance.MusicPlayer
-import com.example.Ballance.Utilities.TiltSensorHandler
+import com.example.ballance.Utilities.TiltSensorHandler
 import com.example.ballance.ui.theme.accentColor
 import com.example.ballance.viewModels.GameViewModel
 
@@ -52,13 +52,12 @@ fun GameScreen(
     val maze = viewModel.getMaze()
     val rows = maze.size
     val cols = maze[0].size
-    val cellSize = 70f // size of each cell in pixels
+    val cellSize = 66f // size of each cell in pixels
     var velocityX = viewModel.getVelocityX()
     var velocityY = viewModel.getVelocityY()
-
     // Track ball position in world-space pixels (stateful for Compose redraw)
-    var ballX by remember { mutableStateOf(cellSize * (cols / 2)) }
-    var ballY by remember { mutableStateOf(cellSize * (rows / 2)) }
+    var ballX by remember { mutableStateOf(cellSize * (rows / 2)) }
+    var ballY by remember { mutableStateOf(cellSize * (cols / 2)) }
 
     // Launch a coroutine that starts when this Composable is composed.
     // This will run our real-time physics update loop (60fps-like).
@@ -155,10 +154,12 @@ fun GameScreen(
                     //debug values on screen
                     fun Float.format(digits: Int): String = "%.${digits}f".format(this)
 
-                    Text("ax: ${sensorHandler.tiltX.format(2)}", color = Color.White, fontSize = 14.sp)
-                    Text("ay: ${sensorHandler.tiltY.format(2)}", color = Color.White, fontSize = 14.sp)
-                    Text("vx: ${velocityX.format(2)}", color = Color.White, fontSize = 14.sp)
-                    Text("vy: ${velocityY.format(2)}", color = Color.White, fontSize = 14.sp)
+                    Text("ax: ${sensorHandler.tiltX.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+                    Text("ay: ${sensorHandler.tiltY.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+                    Text("vx: ${velocityX.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+                    Text("vy: ${velocityY.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+                    Text("xcor: ${ballX.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+                    Text("ycor: ${ballY.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
                 }
 
                 // "Back to Menu" button in lower-center

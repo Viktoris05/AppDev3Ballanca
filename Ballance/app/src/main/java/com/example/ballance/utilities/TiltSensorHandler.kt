@@ -1,4 +1,4 @@
-package com.example.Ballance.Utilities
+package com.example.ballance.Utilities
 
 import android.content.Context
 import android.hardware.Sensor
@@ -67,17 +67,17 @@ class TiltSensorHandler(context: Context) : SensorEventListener {
      */
     override fun onSensorChanged(event: SensorEvent?) {
         event?.let {
-            // Read the X-axis tilt (left/right), and invert it:
+            // Read the X-axis tilt (left/right), no inversion:
             // - Tilting right should give a POSITIVE value
             // - Tilting left should give a NEGATIVE value
             // Multiply by 2 to increase horizontal sensitivity
-            _tiltX = -event.values[0] * 2
+            _tiltX = event.values[1] * 2
 
             // Read the Y-axis tilt (up/down), no inversion:
             // - Tilting down gives POSITIVE
             // - Tilting up gives NEGATIVE
             // Multiply by 2 to increase vertical sensitivity
-            _tiltY = event.values[1] * 2
+            _tiltY = event.values[0] * 2
         }
     }
 
