@@ -15,13 +15,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.ballance.MusicPlayer
+import com.example.ballance.ui.theme.*
 
 @Composable
 fun LevelSelectScreen(navController: NavController) {
     val context = LocalContext.current
     var isPlaying by remember { mutableStateOf(MusicPlayer.isPlaying) }
 
-    Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFF121212)) {
+    Surface(modifier = Modifier.fillMaxSize(), color = backgroundColor) {
         Column(modifier = Modifier.fillMaxSize()) {
             Row(
                 modifier = Modifier

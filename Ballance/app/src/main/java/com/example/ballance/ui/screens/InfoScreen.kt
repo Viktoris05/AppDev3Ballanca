@@ -15,14 +15,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.ballance.ui.theme.*
 
 @Composable
 fun InfoScreen(navController: NavController) {
     val gradient = Brush.verticalGradient(
         colors = listOf(
-            Color(0xFF1C1C1C),    // Dunkles Grau oben
-            Color(0xFF3E3E3E),    // Mittelgrau
-            Color(0xFFB38E5D)     // Goldbraun am unteren Ende
+            graphitBlackColor,    // Dunkles Grau oben
+            greyColor,    // Mittelgrau
+            goldBrownColor     // Goldbraun am unteren Ende
         )
     )
 
@@ -49,7 +50,7 @@ fun InfoScreen(navController: NavController) {
                 )
 
                 Text(
-                    text = "Ballance ist ein Geschicklichkeitsspiel, bei dem du eine Kugel durch ein Labyrinth steuerst, indem du dein Smartphone kippst.\n\n" +
+                    text = "Ballance ist ein Geschicklichkeitsspiel, bei dem du eine Kugel durch ein Labyrinth steuerst, indem du dein Smartphone kippst. " +
                             "Ziel ist es, das Loch am Ende jedes Levels zu erreichen.\n\n" +
                             "Die App wurde im Jahr 2025 im Rahmen der Lehrveranstaltung \"App Development\" entwickelt.",
                     fontSize = 16.sp,
@@ -76,7 +77,8 @@ fun InfoScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(40.dp))
 
-                Button(onClick = { navController.popBackStack() }) {
+                Button(colors = ButtonDefaults.buttonColors(containerColor = accentColor, contentColor = Color.White),
+                    onClick = { navController.popBackStack() }) {
                     Text(text = "Zurück", fontSize = 16.sp)
                 }
             }

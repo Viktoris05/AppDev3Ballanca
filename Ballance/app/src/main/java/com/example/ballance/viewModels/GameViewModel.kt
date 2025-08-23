@@ -28,8 +28,10 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     private lateinit var physics: TiltGravityPhysics
 
     // Ball position in pixel coordinates (world-space)
-    private var ballX = 0f
-    private var ballY = 0f
+    var ballX = 0f
+        private set
+    var ballY = 0f
+        private set
 
     init {
         loadMaze()

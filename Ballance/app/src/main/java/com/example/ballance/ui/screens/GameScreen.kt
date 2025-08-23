@@ -17,6 +17,7 @@ import com.example.ballance.ui.screens.utilities.GameCanvas
 import com.example.ballance.MusicPlayer
 import com.example.ballance.Utilities.TiltSensorHandler
 import com.example.ballance.ui.theme.accentColor
+import com.example.ballance.ui.theme.backgroundColor
 import com.example.ballance.viewModels.GameViewModel
 
 /**
@@ -50,14 +51,12 @@ fun GameScreen(
 
     // Load maze and dimensions
     val maze = viewModel.getMaze()
-    val rows = maze.size
-    val cols = maze[0].size
     val cellSize = 66f // size of each cell in pixels
     var velocityX = viewModel.getVelocityX()
     var velocityY = viewModel.getVelocityY()
     // Track ball position in world-space pixels (stateful for Compose redraw)
-    var ballX by remember { mutableStateOf(cellSize * (rows / 2)) }
-    var ballY by remember { mutableStateOf(cellSize * (cols / 2)) }
+    var ballX by remember { mutableStateOf(viewModel.ballX) }
+    var ballY by remember { mutableStateOf(viewModel.ballY) }
 
     // Launch a coroutine that starts when this Composable is composed.
     // This will run our real-time physics update loop (60fps-like).
@@ -106,7 +105,7 @@ fun GameScreen(
 
 
 
-    Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFF121212)) {
+    Surface(modifier = Modifier.fillMaxSize(), color = backgroundColor) {
         Column(modifier = Modifier.fillMaxSize()) {
             // Top bar with Back and Music toggle
             Row(

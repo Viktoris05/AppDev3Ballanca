@@ -1,4 +1,8 @@
 package com.example.ballance.physics
+
+import com.example.ballance.ui.screens.GameScreen
+import com.example.ballance.ui.screens.utilities.GameCanvas
+
 /**
  * Represents the behavior associated with a specific maze cell.
  *
@@ -17,6 +21,8 @@ sealed class CellBehavior {
      * Default is true (passable).
      */
     open fun allowsMovement(): Boolean = true
+
+    open fun isInBlackHole(): Boolean = false
 
     /**
      * Optional callback triggered when the ball enters this tile.

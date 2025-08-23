@@ -17,8 +17,8 @@ import androidx.compose.ui.unit.IntSize
  *
  * @param cellSize Size of each maze cell in pixels.
  * @param canvasSize Full canvas dimensions (in pixels), passed from `DrawScope.size`.
- * @param numCols Number of columns in the maze (horizontal cells).
- * @param numRows Number of rows in the maze (vertical cells).
+ * @param numCols Number of columns in the maze (vertical cells).
+ * @param numRows Number of rows in the maze (horizontal cells).
  *
  * This mapper precomputes the maze’s on-screen size and its offset to center it on the canvas.
  */
@@ -29,12 +29,12 @@ class WorldToScreenMapper(
     private val numRows: Int
 ) {
     // Total maze width/height in pixels
-    private val mazeWidth = numCols * cellSize
-    private val mazeHeight = numRows * cellSize
+    private val mazeWidth = numRows * cellSize
+    private val mazeHeight = numCols * cellSize
 
     // Offset to center the maze in the available canvas
-    private val offsetX = 0 //(canvasSize.width - mazeWidth) / 2f
-    private val offsetY = (canvasSize.height - mazeHeight) / 7f
+    private val offsetX = (canvasSize.width - mazeWidth) / 2f
+    private val offsetY = (canvasSize.height - mazeHeight) / 2f
 
     /**
      * Converts a maze-space position (x, y in pixels) to screen-space.
