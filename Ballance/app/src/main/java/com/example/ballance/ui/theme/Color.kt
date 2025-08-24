@@ -13,9 +13,10 @@ val Pink40 = Color(0xFF7D5260)
 /** used as the Background in the Main Menu*/
 val backgroundColor = Color(0xFF121212)
 
-/** used for Logo, UI, and Walls*/
+/** used for Logo, UI, Buttons and Walls*/
 val accentColor: Color = Color(0xFFC89B5C)
-
+/** used when a Button is selected*/
+val accentColorSelected: Color = Color(0xFF807120)
 /** used for correct holes */
 val finishColor: Color = Color(0xFF009200)
 

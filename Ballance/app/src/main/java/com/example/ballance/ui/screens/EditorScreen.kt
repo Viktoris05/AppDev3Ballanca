@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +20,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -81,7 +83,7 @@ fun EditorScreen(
                     Button(
                         onClick = { selectedType = CellType.EMPTY },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = accentColor,
+                            containerColor = if(selectedType == CellType.EMPTY) accentColorSelected else accentColor,
                             contentColor = Color.White
                         )
                     ) {
@@ -90,7 +92,7 @@ fun EditorScreen(
                     Button(
                         onClick = { selectedType = CellType.WALL },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = accentColor,
+                            containerColor = if(selectedType == CellType.WALL) accentColorSelected else accentColor,
                             contentColor = Color.White
                         )
                     ) {
@@ -99,7 +101,7 @@ fun EditorScreen(
                     Button(
                         onClick = { selectedType = CellType.FINISH },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = accentColor,
+                            containerColor = if(selectedType == CellType.FINISH) accentColorSelected else accentColor,
                             contentColor = Color.White
                         )
                     ) {
@@ -108,7 +110,7 @@ fun EditorScreen(
                     Button(
                         onClick = { selectedType = CellType.SLOWDOWN },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = accentColor,
+                            containerColor = if(selectedType == CellType.SLOWDOWN) accentColorSelected else accentColor,
                             contentColor = Color.White
                         )
                     ) {
@@ -117,7 +119,7 @@ fun EditorScreen(
                     Button(
                         onClick = { selectedType = CellType.SPEEDUP },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = accentColor,
+                            containerColor = if(selectedType == CellType.SPEEDUP) accentColorSelected else accentColor,
                             contentColor = Color.White
                         )
                     ) {
@@ -126,7 +128,7 @@ fun EditorScreen(
                     Button(
                         onClick = { selectedType = CellType.BLACKHOLE },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = accentColor,
+                            containerColor = if(selectedType == CellType.BLACKHOLE) accentColorSelected else accentColor,
                             contentColor = Color.White
                         )
                     ) {
@@ -135,33 +137,62 @@ fun EditorScreen(
                 }
 
                 // Maze grid display
-                for (col in 0 until viewModel.cols) {
-                    Column(modifier = Modifier.horizontalScroll(horizontalScroll)) {
-                        for (row in 0 until viewModel.rows) {
-                            val cellState = mazeGrid[row][col]
-                            val cellType by cellState
+                val cellSize = 19.dp
+                val gridWidth = cellSize * viewModel.cols
+                val gridHeight = cellSize * viewModel.rows
 
-                            Box(
-                                modifier = Modifier
-                                    .size(19.dp)
-                                    .background(
-                                        when (cellType) {
-                                            CellType.EMPTY -> Color.White
-                                            CellType.WALL -> accentColor
-                                            CellType.FINISH -> finishColor
-                                            CellType.SLOWDOWN -> slowdownColor
-                                            CellType.SPEEDUP -> speedupColor
-                                            CellType.BLACKHOLE -> Color.Black
-                                        }
-                                    )
-                                    .border(1.dp, Color.Gray)
-                                    .clickable {
+                Box(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .size(width = gridWidth, height = gridHeight)
+                        .pointerInput(Unit) {
+                            detectDragGestures(
+                                onDragStart = { offset ->
+                                    val row = (offset.y / cellSize.toPx()).toInt()
+                                    val col = (offset.x / cellSize.toPx()).toInt()
+                                    if (row in 0 until viewModel.rows && col in 0 until viewModel.cols) {
                                         viewModel.setCell(row, col, selectedType)
                                     }
-                            )
+                                },
+                                onDrag = { change, _ ->
+                                    val row = (change.position.y / cellSize.toPx()).toInt()
+                                    val col = (change.position.x / cellSize.toPx()).toInt()
+                                    if (row in 0 until viewModel.rows && col in 0 until viewModel.cols) {
+                                        viewModel.setCell(row, col, selectedType)
+                                    }
+                                    change.consume()
+                                })
+
+                        }
+                ) {
+                Row {
+                    for (col in 0 until viewModel.cols) {
+                        Column {
+                            for (row in 0 until viewModel.rows) {
+                                val cellState = mazeGrid[row][col]
+                                val cellType by cellState
+
+                                Box(
+                                    modifier = Modifier
+                                        .size(19.dp)
+                                        .background(
+                                            when (cellType) {
+                                                CellType.EMPTY -> Color.White
+                                                CellType.WALL -> accentColor
+                                                CellType.FINISH -> finishColor
+                                                CellType.SLOWDOWN -> slowdownColor
+                                                CellType.SPEEDUP -> speedupColor
+                                                CellType.BLACKHOLE -> Color.Black
+                                            }
+                                        )
+                                        .border(1.dp, Color.Gray)
+
+                                )
+                            }
                         }
                     }
                 }
+            }
 
 
 
