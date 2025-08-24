@@ -33,8 +33,8 @@ class WorldToScreenMapper(
     private val mazeHeight = numCols * cellSize
 
     // Offset to center the maze in the available canvas
-    private val offsetX = (canvasSize.width - mazeWidth) / 2f
-    private val offsetY = (canvasSize.height - mazeHeight) / 2f
+    private val offsetX = 0 //(canvasSize.width - mazeWidth) / 2f (old value)
+    private val offsetY = (canvasSize.height - mazeHeight) / 7f
 
     /**
      * Converts a maze-space position (x, y in pixels) to screen-space.
@@ -59,8 +59,8 @@ class WorldToScreenMapper(
      * @return A screen-space Offset for the top-left corner of the cell.
      */
     fun cellTopLeft(row: Int, col: Int): Offset {
-        val left = row * cellSize + offsetX
-        val top = col * cellSize + offsetY
+        val left = col * cellSize + offsetX
+        val top = row * cellSize + offsetY
         return Offset(left, top)
     }
 

@@ -135,9 +135,9 @@ fun EditorScreen(
                 }
 
                 // Maze grid display
-                for (row in 0 until viewModel.rows) {
+                for (col in 0 until viewModel.cols) {
                     Column(modifier = Modifier.horizontalScroll(horizontalScroll)) {
-                        for (col in 0 until viewModel.cols) {
+                        for (row in 0 until viewModel.rows) {
                             val cellState = mazeGrid[row][col]
                             val cellType by cellState
 

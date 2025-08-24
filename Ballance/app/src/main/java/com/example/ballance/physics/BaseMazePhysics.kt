@@ -176,9 +176,9 @@ abstract class BaseMazePhysics(
         val topRow = ((tentativeY - ballRadius) / cellSize).toInt().coerceIn(0, rows - 1)
         val bottomRow = ((tentativeY + ballRadius) / cellSize).toInt().coerceIn(0, rows - 1)
 
-        val hitCeilingOrFloor = (velocityY < 0 && blocksMovement(
-            maze[topRow][leftCol], maze[topRow][rightCol]
-        )) || (velocityY > 0 && blocksMovement(
+        val hitCeilingOrFloor = (velocityY < 0 && (
+                blocksMovement(maze[topRow][leftCol], maze[topRow][rightCol])))
+                || (velocityY > 0 && blocksMovement(
             maze[bottomRow][leftCol], maze[bottomRow][rightCol]
         ))
 
