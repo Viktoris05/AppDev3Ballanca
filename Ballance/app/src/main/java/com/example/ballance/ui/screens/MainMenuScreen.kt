@@ -62,45 +62,11 @@ fun MainMenuScreen(navController: NavController) {
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
 
-            // Lautsprecher- und Info-Button oben rechts – im Landscape minimal kleiner
-            Row(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(16.dp)
-            ) {
-                IconButton(
-                    onClick = {
-                        MusicPlayer.toggle(context)
-                        isPlaying = MusicPlayer.isPlaying
-                    },
-                    modifier = Modifier.size(iconSize)
-                ) {
-                    Icon(
-                        imageVector = if (isPlaying) Icons.Filled.VolumeUp else Icons.Filled.VolumeOff,
-                        contentDescription = "Musik umschalten",
-                        tint = Color.White,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(betweenTopIcons))
-
-                IconButton(
-                    onClick = { navController.navigate(Screen.Info.route) },
-                    modifier = Modifier.size(iconSize)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Info,
-                        contentDescription = "Info",
-                        tint = Color.White,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-            }
-
+            // HAUPT-COLUMN (liegt unten, damit die Top-Right-Buttons darüber liegen können)
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .statusBarsPadding() // verhindert Überlappung mit Statusleiste/Notch
                     .padding(horizontal = columnHorizontalPadding)
                     // Falls das Display extrem klein ist, verhindert Scrollen ein Abschneiden
                     .verticalScroll(rememberScrollState()),
@@ -158,6 +124,43 @@ fun MainMenuScreen(navController: NavController) {
                     verticalPadding = buttonVerticalPadding,
                     textSize = buttonTextSize
                 ) { navController.navigate(Screen.Editor.route) }
+            }
+
+            // TOP-RIGHT ICONS (NACH der Column deklariert => werden OBEN gerendert & erhalten Klicks)
+            Row(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .statusBarsPadding()
+                    .padding(16.dp)
+            ) {
+                IconButton(
+                    onClick = {
+                        MusicPlayer.toggle(context)
+                        isPlaying = MusicPlayer.isPlaying
+                    },
+                    modifier = Modifier.size(iconSize)
+                ) {
+                    Icon(
+                        imageVector = if (isPlaying) Icons.Filled.VolumeUp else Icons.Filled.VolumeOff,
+                        contentDescription = "Musik umschalten",
+                        tint = Color.White,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(betweenTopIcons))
+
+                IconButton(
+                    onClick = { navController.navigate(Screen.Info.route) },
+                    modifier = Modifier.size(iconSize)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Info,
+                        contentDescription = "Info",
+                        tint = Color.White,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
         }
     }
