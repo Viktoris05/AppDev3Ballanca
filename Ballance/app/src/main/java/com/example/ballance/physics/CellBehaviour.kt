@@ -21,6 +21,10 @@ sealed class CellBehavior {
 
     open fun isInRedWall(): Boolean = false
 
+    open fun SlowDownOn(): Boolean = false
+
+    open fun SpeedUpOn(): Boolean = false
+
     /**
      * Optional callback triggered when the ball enters this tile.
      * Default is no effect.
@@ -46,12 +50,12 @@ sealed class CellBehavior {
 
     /** Represents a slowdown tile: ball touching this tile will slow down significantly */
     object Slowdown : CellBehavior() {
-
+        override fun SlowDownOn() = true
     }
 
     /** Represents a speedup tile: ball touching this tile will speed up significantly */
     object Speedup : CellBehavior() {
-
+        override fun SpeedUpOn() = true
     }
 
     /** Represents a wall that "destroys" the ball. If the ball touches this, the ball will respawn */

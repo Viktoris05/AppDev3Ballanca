@@ -70,6 +70,8 @@ abstract class BaseMazePhysics(
 
         // Apply acceleration, friction, and clamp speed
         applyPhysics(tiltX, tiltY, deltaTime)
+        resolveSlowDown(pos, cellSize, maze, rowCount, colCount)
+        resolveSpeedUp(pos, cellSize, maze, rowCount, colCount)
 
         // Move horizontally and handle wall collisions
         resolveHorizontal(pos, cellSize, maze, rowCount, colCount)
@@ -226,6 +228,62 @@ abstract class BaseMazePhysics(
         if(touchedRedWall){
             pos.x = cellSize * (maze[0].size / 2)
             pos.y = cellSize * (maze.size / 2)
+        }
+    }
+
+    open fun inSlowDown(vararg tiles: CellType): Boolean{
+        return tiles.any { it.toBehavior().SlowDownOn() }
+    }
+
+    open fun resolveSlowDown(
+        pos: Pos,
+        cellSize: Float,
+        maze: Array<Array<CellType>>,
+        rowCount: Int,
+        colCount: Int
+    ) {
+
+        // Which columns the ball overlaps
+        val leftCol = ((pos.x - ballRadius) / cellSize).toInt().coerceIn(0, colCount - 1)
+        val rightCol = ((pos.x + ballRadius) / cellSize).toInt().coerceIn(0, colCount - 1)
+
+        // Which rows top/bottom
+        val topRow = ((pos.y - ballRadius) / cellSize).toInt().coerceIn(0, rowCount - 1)
+        val bottomRow = ((pos.y + ballRadius) / cellSize).toInt().coerceIn(0, rowCount - 1)
+
+        val touchedSlowDown = (inSlowDown(maze[topRow][leftCol],maze[bottomRow][rightCol]))
+
+        if(touchedSlowDown){
+            velocityX = velocityX / 2
+            velocityY = velocityY / 2
+        }
+    }
+
+    open fun inSpeedUp(vararg tiles: CellType): Boolean{
+        return tiles.any { it.toBehavior().SpeedUpOn() }
+    }
+
+    open fun resolveSpeedUp(
+        pos: Pos,
+        cellSize: Float,
+        maze: Array<Array<CellType>>,
+        rowCount: Int,
+        colCount: Int
+    ) {
+
+        // Which columns the ball overlaps
+        val leftCol = ((pos.x - ballRadius) / cellSize).toInt().coerceIn(0, colCount - 1)
+        val rightCol = ((pos.x + ballRadius) / cellSize).toInt().coerceIn(0, colCount - 1)
+
+        // Which rows top/bottom
+        val topRow = ((pos.y - ballRadius) / cellSize).toInt().coerceIn(0, rowCount - 1)
+        val bottomRow = ((pos.y + ballRadius) / cellSize).toInt().coerceIn(0, rowCount - 1)
+
+        val touchedSpeedUp = (inSpeedUp(maze[topRow][leftCol],maze[bottomRow][rightCol]))
+
+        if(touchedSpeedUp){
+            velocityX *= 2
+            velocityY *= 2
         }
     }
 
