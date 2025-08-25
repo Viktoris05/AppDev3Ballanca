@@ -7,6 +7,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
 import com.example.ballance.physics.CellType
+import com.example.ballance.ui.theme.accentColor
+import com.example.ballance.ui.theme.finishColor
+import com.example.ballance.ui.theme.slowdownColor
+import com.example.ballance.ui.theme.speedupColor
 
 /**
  * Composable responsible for drawing the current state of the maze and ball.
@@ -48,9 +52,12 @@ fun GameCanvas(
 
                 // Color by type
                 val color = when (maze[row][col]) {
-                    CellType.WALL   -> Color.Black
-                    CellType.FINISH -> Color.Green
-                    else            -> Color.LightGray
+                    CellType.EMPTY -> Color.White //change to black later once we have clear outlines for black holes
+                    CellType.WALL -> accentColor
+                    CellType.FINISH -> finishColor
+                    CellType.SLOWDOWN -> slowdownColor
+                    CellType.SPEEDUP -> speedupColor
+                    CellType.BLACKHOLE -> Color.Black
                 }
 
                 // Draw the rectangle for the tile

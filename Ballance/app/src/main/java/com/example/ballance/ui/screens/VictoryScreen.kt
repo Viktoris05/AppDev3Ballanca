@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.ballance.MusicPlayer
 import com.example.ballance.ui.navigation.Screen
+import com.example.ballance.ui.theme.*
 
 @Composable
 fun VictoryScreen(navController: NavController) {
@@ -26,9 +27,9 @@ fun VictoryScreen(navController: NavController) {
 
     val gradient = Brush.verticalGradient(
         colors = listOf(
-            Color(0xFF1A1A1A),
-            Color(0xFF2C2C2C),
-            Color(0xFFC89B5C)
+            cocoBlackColor,
+            darkGreyColor,
+            accentColor
         )
     )
 

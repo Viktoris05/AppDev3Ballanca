@@ -22,10 +22,10 @@ import kotlinx.serialization.json.Json
 class MazeViewModel : ViewModel() {
 
     /** Number of rows in the maze grid */
-    val rows = 36
+    val rows = 16
 
     /** Number of columns in the maze grid */
-    val cols = 16
+    val cols = 36
 
     /**
      * 2D grid of observable [CellType]s.

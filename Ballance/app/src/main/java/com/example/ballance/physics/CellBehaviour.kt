@@ -1,4 +1,8 @@
 package com.example.ballance.physics
+
+import com.example.ballance.ui.screens.GameScreen
+import com.example.ballance.ui.screens.utilities.GameCanvas
+
 /**
  * Represents the behavior associated with a specific maze cell.
  *
@@ -17,6 +21,8 @@ sealed class CellBehavior {
      * Default is true (passable).
      */
     open fun allowsMovement(): Boolean = true
+
+    open fun isInBlackHole(): Boolean = false
 
     /**
      * Optional callback triggered when the ball enters this tile.
@@ -39,6 +45,21 @@ sealed class CellBehavior {
         override fun onEnter(): (() -> Unit)? = {
             onVictoryCallback?.invoke()
         }
+    }
+
+    /** Represents a slowdown tile: ball touching this tile will slow down significantly */
+    object Slowdown : CellBehavior() {
+
+    }
+
+    /** Represents a speedup tile: ball touching this tile will speed up significantly */
+    object Speedup : CellBehavior() {
+
+    }
+
+    /** Represents an imposter hole. If the ball falls into this hole the ball will respawn */
+    object Blackhole : CellBehavior() {
+
     }
 
 }

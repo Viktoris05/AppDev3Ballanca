@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
@@ -19,13 +20,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.ballance.physics.CellType
 import com.example.ballance.viewModels.MazeViewModel
 import com.example.ballance.MusicPlayer
-import com.example.ballance.ui.theme.accentColor
+import com.example.ballance.ui.theme.*
 
 @Composable
 fun EditorScreen(
@@ -76,56 +78,125 @@ fun EditorScreen(
                     .fillMaxSize()
             ) {
 
-                // Maze grid display
-                for (row in 0 until viewModel.rows) {
-                    Column(modifier = Modifier.horizontalScroll(horizontalScroll)) {
-                        for (col in 0 until viewModel.cols) {
-                            val cellState = mazeGrid[row][col]
-                            val cellType by cellState
-
-                            Box(
-                                modifier = Modifier
-                                    .size(19.dp)
-                                    .background(
-                                        when (cellType) {
-                                            CellType.EMPTY -> Color.White
-                                            CellType.WALL -> Color.Black
-                                            CellType.FINISH -> Color.Green
-                                            else -> Color.Magenta
-                                        }
-                                    )
-                                    .border(1.dp, Color.Gray)
-                                    .clickable {
-                                        viewModel.setCell(row, col, selectedType)
-                                    }
-                            )
-                        }
+                // Tile selection buttons
+                Column {
+                    Button(
+                        onClick = { selectedType = CellType.EMPTY },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if(selectedType == CellType.EMPTY) accentColorSelected else accentColor,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Empty")
+                    }
+                    Button(
+                        onClick = { selectedType = CellType.WALL },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if(selectedType == CellType.WALL) accentColorSelected else accentColor,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Wall")
+                    }
+                    Button(
+                        onClick = { selectedType = CellType.FINISH },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if(selectedType == CellType.FINISH) accentColorSelected else accentColor,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Finish")
+                    }
+                    Button(
+                        onClick = { selectedType = CellType.SLOWDOWN },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if(selectedType == CellType.SLOWDOWN) accentColorSelected else accentColor,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Slowdown")
+                    }
+                    Button(
+                        onClick = { selectedType = CellType.SPEEDUP },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if(selectedType == CellType.SPEEDUP) accentColorSelected else accentColor,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Speedup")
+                    }
+                    Button(
+                        onClick = { selectedType = CellType.BLACKHOLE },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if(selectedType == CellType.BLACKHOLE) accentColorSelected else accentColor,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Black Hole")
                     }
                 }
 
-                // Tile selection buttons
-                Column {
-                    Button(onClick = { selectedType = CellType.EMPTY },colors = ButtonDefaults.buttonColors(
-                        containerColor = accentColor,
-                        contentColor = Color.White
-                    )) {
-                        Text("Empty")
-                    }
-                    Button(onClick = { selectedType = CellType.WALL },colors = ButtonDefaults.buttonColors(
-                        containerColor = accentColor,
-                        contentColor = Color.White
-                    )) {
-                        Text("Wall")
-                    }
-                    Button(onClick = { selectedType = CellType.FINISH },colors = ButtonDefaults.buttonColors(
-                        containerColor = accentColor,
-                        contentColor = Color.White
-                    )) {
-                        Text("Finish")
-                    }
+                // Maze grid display
+                val cellSize = 19.dp
+                val gridWidth = cellSize * viewModel.cols
+                val gridHeight = cellSize * viewModel.rows
 
-                    Spacer(Modifier.height(30.dp))
+                Box(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .size(width = gridWidth, height = gridHeight)
+                        .pointerInput(Unit) {
+                            detectDragGestures(
+                                onDragStart = { offset ->
+                                    val row = (offset.y / cellSize.toPx()).toInt()
+                                    val col = (offset.x / cellSize.toPx()).toInt()
+                                    if (row in 0 until viewModel.rows && col in 0 until viewModel.cols) {
+                                        viewModel.setCell(row, col, selectedType)
+                                    }
+                                },
+                                onDrag = { change, _ ->
+                                    val row = (change.position.y / cellSize.toPx()).toInt()
+                                    val col = (change.position.x / cellSize.toPx()).toInt()
+                                    if (row in 0 until viewModel.rows && col in 0 until viewModel.cols) {
+                                        viewModel.setCell(row, col, selectedType)
+                                    }
+                                    change.consume()
+                                })
 
+                        }
+                ) {
+                Row {
+                    for (col in 0 until viewModel.cols) {
+                        Column {
+                            for (row in 0 until viewModel.rows) {
+                                val cellState = mazeGrid[row][col]
+                                val cellType by cellState
+
+                                Box(
+                                    modifier = Modifier
+                                        .size(19.dp)
+                                        .background(
+                                            when (cellType) {
+                                                CellType.EMPTY -> Color.White
+                                                CellType.WALL -> accentColor
+                                                CellType.FINISH -> finishColor
+                                                CellType.SLOWDOWN -> slowdownColor
+                                                CellType.SPEEDUP -> speedupColor
+                                                CellType.BLACKHOLE -> Color.Black
+                                            }
+                                        )
+                                        .border(1.dp, Color.Gray)
+
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+
+
+                Column{
                     Button(
                         onClick = {
                             viewModel.saveMaze(context)
@@ -138,6 +209,8 @@ fun EditorScreen(
                         Text("Save Maze")
                     }
 
+                    Spacer(modifier = Modifier.size(5.dp))
+
                     Button(
                         onClick = {
                             viewModel.loadMaze(context)
@@ -149,6 +222,8 @@ fun EditorScreen(
                     ) {
                         Text("Load Maze")
                     }
+
+                    Spacer(modifier = Modifier.size(5.dp))
 
                     Button(
                         onClick = { navController.popBackStack() },

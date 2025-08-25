@@ -26,12 +26,13 @@ import androidx.navigation.NavController
 import com.example.ballance.MusicPlayer
 import com.example.ballance.R
 import com.example.ballance.ui.navigation.Screen
+import com.example.ballance.ui.theme.*
 
 @Composable
 fun MainMenuScreen(navController: NavController) {
     val context = LocalContext.current
-    val backgroundColor = Color(0xFF121212)
-    val accentColor = Color(0xFFC89B5C)
+    val backgroundColor = backgroundColor
+    val accentColor = accentColor
     val textColor = Color.White
     var isPlaying by remember { mutableStateOf(MusicPlayer.isPlaying) }
 
