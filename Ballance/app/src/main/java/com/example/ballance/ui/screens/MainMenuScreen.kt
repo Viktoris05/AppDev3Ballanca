@@ -1,7 +1,10 @@
 package com.example.ballance.ui.screens
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
@@ -13,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -20,8 +24,10 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.TextUnit
 import androidx.navigation.NavController
 import com.example.ballance.MusicPlayer
 import com.example.ballance.R
@@ -31,10 +37,24 @@ import com.example.ballance.ui.theme.*
 @Composable
 fun MainMenuScreen(navController: NavController) {
     val context = LocalContext.current
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
     val backgroundColor = backgroundColor
     val accentColor = accentColor
     val textColor = Color.White
     var isPlaying by remember { mutableStateOf(MusicPlayer.isPlaying) }
+
+    // responsive Größen/Abstände
+    val iconSize = if (isLandscape) 40.dp else 48.dp
+    val columnHorizontalPadding = if (isLandscape) 16.dp else 24.dp
+    val logoSize = if (isLandscape) 120.dp else 160.dp
+    val titleSize = if (isLandscape) 30.sp else 36.sp
+    val titleBottomPadding = if (isLandscape) 6.dp else 10.dp
+    val buttonWidthFraction = if (isLandscape) 0.8f else 0.75f
+    val buttonVerticalPadding = if (isLandscape) 6.dp else 10.dp
+    val buttonTextSize = if (isLandscape) 16.sp else 18.sp
+    val betweenTopIcons = if (isLandscape) 6.dp else 8.dp
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -42,7 +62,7 @@ fun MainMenuScreen(navController: NavController) {
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
 
-            // Lautsprecher- und Info-Button oben rechts – gleich groß (48.dp)
+            // Lautsprecher- und Info-Button oben rechts – im Landscape minimal kleiner
             Row(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -53,7 +73,7 @@ fun MainMenuScreen(navController: NavController) {
                         MusicPlayer.toggle(context)
                         isPlaying = MusicPlayer.isPlaying
                     },
-                    modifier = Modifier.size(48.dp) // 👈 kleiner als vorher
+                    modifier = Modifier.size(iconSize)
                 ) {
                     Icon(
                         imageVector = if (isPlaying) Icons.Filled.VolumeUp else Icons.Filled.VolumeOff,
@@ -63,11 +83,11 @@ fun MainMenuScreen(navController: NavController) {
                     )
                 }
 
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(betweenTopIcons))
 
                 IconButton(
                     onClick = { navController.navigate(Screen.Info.route) },
-                    modifier = Modifier.size(48.dp) // 👈 größer als vorher
+                    modifier = Modifier.size(iconSize)
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Info,
@@ -81,15 +101,16 @@ fun MainMenuScreen(navController: NavController) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 24.dp),
+                    .padding(horizontal = columnHorizontalPadding)
+                    // Falls das Display extrem klein ist, verhindert Scrollen ein Abschneiden
+                    .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.logo),
                     contentDescription = "Ballance Logo",
-                    modifier = Modifier
-                        .size(160.dp)
+                    modifier = Modifier.size(logoSize)
                 )
 
                 Text(
@@ -98,7 +119,7 @@ fun MainMenuScreen(navController: NavController) {
                             style = SpanStyle(
                                 color = accentColor,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 36.sp,
+                                fontSize = titleSize,
                                 shadow = Shadow(color = accentColor.copy(alpha = 0.5f), blurRadius = 4f)
                             )
                         ) { append("Ball") }
@@ -106,41 +127,60 @@ fun MainMenuScreen(navController: NavController) {
                             style = SpanStyle(
                                 color = textColor,
                                 fontWeight = FontWeight.Light,
-                                fontSize = 36.sp
+                                fontSize = titleSize
                             )
                         ) { append("ance") }
                     },
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(bottom = 10.dp)
+                    modifier = Modifier.padding(bottom = titleBottomPadding)
                 )
 
-                MenuButton("Spiel Starten", accentColor) {
-                    navController.navigate(Screen.Game.route)
-                }
+                MenuButton(
+                    text = "Spiel Starten",
+                    color = accentColor,
+                    widthFraction = buttonWidthFraction,
+                    verticalPadding = buttonVerticalPadding,
+                    textSize = buttonTextSize
+                ) { navController.navigate(Screen.Game.route) }
 
-                MenuButton("Level Auswählen", accentColor) {
-                    navController.navigate(Screen.LevelSelect.route)
-                }
+                MenuButton(
+                    text = "Level Auswählen",
+                    color = accentColor,
+                    widthFraction = buttonWidthFraction,
+                    verticalPadding = buttonVerticalPadding,
+                    textSize = buttonTextSize
+                ) { navController.navigate(Screen.LevelSelect.route) }
 
-                MenuButton("Editor", accentColor) {
-                    navController.navigate(Screen.Editor.route)
-                }
+                MenuButton(
+                    text = "Editor",
+                    color = accentColor,
+                    widthFraction = buttonWidthFraction,
+                    verticalPadding = buttonVerticalPadding,
+                    textSize = buttonTextSize
+                ) { navController.navigate(Screen.Editor.route) }
             }
         }
     }
 }
 
 @Composable
-fun MenuButton(text: String, color: Color, onClick: () -> Unit) {
+fun MenuButton(
+    text: String,
+    color: Color,
+    widthFraction: Float = 0.75f,
+    verticalPadding: Dp = 10.dp,
+    textSize: TextUnit = 18.sp,
+    onClick: () -> Unit
+) {
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = color),
         modifier = Modifier
-            .fillMaxWidth(0.75f)
-            .padding(vertical = 10.dp),
+            .fillMaxWidth(widthFraction)
+            .padding(vertical = verticalPadding),
         shape = RoundedCornerShape(16.dp),
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
     ) {
-        Text(text = text, color = Color.White, fontSize = 18.sp)
+        Text(text = text, color = Color.White, fontSize = textSize)
     }
 }
