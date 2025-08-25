@@ -1,8 +1,5 @@
 package com.example.ballance.physics
 
-import com.example.ballance.ui.screens.GameScreen
-import com.example.ballance.ui.screens.utilities.GameCanvas
-
 /**
  * Represents the behavior associated with a specific maze cell.
  *
@@ -22,7 +19,7 @@ sealed class CellBehavior {
      */
     open fun allowsMovement(): Boolean = true
 
-    open fun isInBlackHole(): Boolean = false
+    open fun isInRedWall(): Boolean = false
 
     /**
      * Optional callback triggered when the ball enters this tile.
@@ -57,9 +54,9 @@ sealed class CellBehavior {
 
     }
 
-    /** Represents an imposter hole. If the ball falls into this hole the ball will respawn */
-    object Blackhole : CellBehavior() {
-
+    /** Represents a wall that "destroys" the ball. If the ball touches this, the ball will respawn */
+    object RedWall : CellBehavior() {
+        override fun isInRedWall() = true
     }
 
 }

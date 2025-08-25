@@ -80,6 +80,8 @@ abstract class BaseMazePhysics(
         // Trigger cell-specific effects like goal detection
         triggerEffect(pos, cellSize, maze, rowCount, colCount)
 
+        resolveRedWall(pos, cellSize, maze, rowCount, colCount)
+
         return pos.x to pos.y
     }
 
@@ -194,6 +196,37 @@ abstract class BaseMazePhysics(
      */
     open fun blocksMovement(vararg tiles: CellType): Boolean {
         return tiles.any { !it.toBehavior().allowsMovement() }
+    }
+
+    /**
+     * Return true if any of the given tiles is a red wall.
+     */
+    open fun redWall(vararg tiles: CellType): Boolean{
+        return tiles.any { it.toBehavior().isInRedWall() }
+    }
+
+    open fun resolveRedWall(
+        pos: Pos,
+        cellSize: Float,
+        maze: Array<Array<CellType>>,
+        rowCount: Int,
+        colCount: Int
+    ){
+
+        // Which columns the ball overlaps
+        val leftCol = ((pos.x - ballRadius) / cellSize).toInt().coerceIn(0, colCount - 1)
+        val rightCol = ((pos.x + ballRadius) / cellSize).toInt().coerceIn(0, colCount - 1)
+
+        // Which rows top/bottom
+        val topRow = ((pos.y - ballRadius) / cellSize).toInt().coerceIn(0, rowCount - 1)
+        val bottomRow = ((pos.y + ballRadius) / cellSize).toInt().coerceIn(0, rowCount - 1)
+
+        val touchedRedWall = (redWall(maze[topRow][leftCol],maze[bottomRow][rightCol]))
+
+        if(touchedRedWall){
+            pos.x = cellSize * (maze[0].size / 2)
+            pos.y = cellSize * (maze.size / 2)
+        }
     }
 
     /**
