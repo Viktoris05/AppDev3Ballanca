@@ -19,10 +19,22 @@ sealed class CellBehavior {
      */
     open fun allowsMovement(): Boolean = true
 
+    /**
+     * Return whether the ball touches the Red Wall
+     * Default is false
+     */
     open fun isInRedWall(): Boolean = false
 
+    /**
+     * Return whether the ball touches a SlowDownTile
+     * Default is false
+     */
     open fun SlowDownOn(): Boolean = false
 
+    /**
+     * Return whether the ball touches s SpeedUpTile
+     * Default is false
+     */
     open fun SpeedUpOn(): Boolean = false
 
     /**

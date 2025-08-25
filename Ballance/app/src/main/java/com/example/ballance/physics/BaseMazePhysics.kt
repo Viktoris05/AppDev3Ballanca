@@ -82,6 +82,7 @@ abstract class BaseMazePhysics(
         // Trigger cell-specific effects like goal detection
         triggerEffect(pos, cellSize, maze, rowCount, colCount)
 
+        // Check if the ball touches a Red Wall
         resolveRedWall(pos, cellSize, maze, rowCount, colCount)
 
         return pos.x to pos.y
@@ -207,6 +208,10 @@ abstract class BaseMazePhysics(
         return tiles.any { it.toBehavior().isInRedWall() }
     }
 
+    /**
+     * Check if the ball touches a Red Wall.
+     * Respawn the ball is yes
+     */
     open fun resolveRedWall(
         pos: Pos,
         cellSize: Float,
@@ -231,10 +236,16 @@ abstract class BaseMazePhysics(
         }
     }
 
+    /**
+     * Returns true if the ball touches a SlowDown tile
+     */
     open fun inSlowDown(vararg tiles: CellType): Boolean{
         return tiles.any { it.toBehavior().SlowDownOn() }
     }
 
+    /**
+     * Checks for the Ball getting into a SlowDown tile and slows the ball down
+     */
     open fun resolveSlowDown(
         pos: Pos,
         cellSize: Float,
@@ -259,10 +270,16 @@ abstract class BaseMazePhysics(
         }
     }
 
+    /**
+     * Returns true if the ball touches a SpeedUp tile
+     */
     open fun inSpeedUp(vararg tiles: CellType): Boolean{
         return tiles.any { it.toBehavior().SpeedUpOn() }
     }
 
+    /**
+     * Checks for the Ball getting into a SpeedUp tile and makes the ball faster
+     */
     open fun resolveSpeedUp(
         pos: Pos,
         cellSize: Float,

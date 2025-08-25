@@ -180,7 +180,7 @@ fun EditorScreen(
                                                 CellType.FINISH -> finishColor
                                                 CellType.SLOWDOWN -> slowdownColor
                                                 CellType.SPEEDUP -> speedupColor
-                                                CellType.REDWALL -> Color.Black
+                                                CellType.REDWALL -> redWallColor
                                             }
                                         )
                                         .border(1.dp, Color.Gray)
