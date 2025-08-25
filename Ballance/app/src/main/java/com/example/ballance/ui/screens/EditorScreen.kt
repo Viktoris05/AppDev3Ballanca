@@ -3,9 +3,7 @@ package com.example.ballance.ui.screens
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
@@ -126,13 +124,13 @@ fun EditorScreen(
                         Text("Speedup")
                     }
                     Button(
-                        onClick = { selectedType = CellType.BLACKHOLE },
+                        onClick = { selectedType = CellType.REDWALL },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if(selectedType == CellType.BLACKHOLE) accentColorSelected else accentColor,
+                            containerColor = if(selectedType == CellType.REDWALL) accentColorSelected else accentColor,
                             contentColor = Color.White
                         )
                     ) {
-                        Text("Black Hole")
+                        Text("Red Wall")
                     }
                 }
 
@@ -182,7 +180,7 @@ fun EditorScreen(
                                                 CellType.FINISH -> finishColor
                                                 CellType.SLOWDOWN -> slowdownColor
                                                 CellType.SPEEDUP -> speedupColor
-                                                CellType.BLACKHOLE -> Color.Black
+                                                CellType.REDWALL -> redWallColor
                                             }
                                         )
                                         .border(1.dp, Color.Gray)

@@ -9,6 +9,7 @@ import androidx.compose.ui.unit.IntSize
 import com.example.ballance.physics.CellType
 import com.example.ballance.ui.theme.accentColor
 import com.example.ballance.ui.theme.finishColor
+import com.example.ballance.ui.theme.redWallColor
 import com.example.ballance.ui.theme.slowdownColor
 import com.example.ballance.ui.theme.speedupColor
 
@@ -57,7 +58,7 @@ fun GameCanvas(
                     CellType.FINISH -> finishColor
                     CellType.SLOWDOWN -> slowdownColor
                     CellType.SPEEDUP -> speedupColor
-                    CellType.BLACKHOLE -> Color.Black
+                    CellType.REDWALL -> redWallColor
                 }
 
                 // Draw the rectangle for the tile

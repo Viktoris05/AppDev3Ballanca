@@ -26,6 +26,8 @@ val slowdownColor: Color = Color(0xFFbce954)
 /** used for speed-up tiles*/
 val speedupColor: Color = Color(0xFF1E90FF)
 
+val redWallColor: Color = Color(0xFF800000)
+
 /** used for VictoryScreen */
 val cocoBlackColor: Color = Color(0xFF1A1A1A)
 val darkGreyColor: Color = Color(0xFF2C2C2C)
