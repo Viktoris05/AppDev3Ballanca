@@ -22,7 +22,7 @@ enum class CellType {
     SLOWDOWN,   //Slowdown tile; ball will slowdown while passing through
     SPEEDUP,    //Speedup tile; ball will speedup while passing through
     REDWALL,   //Redwall tile; reaching this will restart the level without restarting the time
-    STARTTILE //Starting tile, ball starts here
+    STARTINGTILE //Starting tile, ball starts here
 }
 
 /**
@@ -38,6 +38,6 @@ fun CellType.toBehavior(): CellBehavior = when (this) {
     CellType.SLOWDOWN -> CellBehavior.Slowdown
     CellType.SPEEDUP -> CellBehavior.Speedup
     CellType.REDWALL -> CellBehavior.RedWall
-    CellType.STARTTILE -> CellBehavior.StartTile
+    CellType.STARTINGTILE -> CellBehavior.StartTile
 }
 
