@@ -59,6 +59,7 @@ fun GameCanvas(
                     CellType.SLOWDOWN -> slowdownColor
                     CellType.SPEEDUP -> speedupColor
                     CellType.REDWALL -> redWallColor
+                    CellType.STARTTILE -> Color.Transparent
                 }
 
                 // Draw the rectangle for the tile
