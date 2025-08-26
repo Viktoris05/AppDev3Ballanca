@@ -34,7 +34,7 @@ class WorldToScreenMapper(
 
     // Offset to center the maze in the available canvas
     private val offsetX = 0 //(canvasSize.width - mazeWidth) / 2f (old value)
-    private val offsetY = (canvasSize.height - mazeHeight) / 7f
+    private val offsetY = (canvasSize.height - mazeHeight) / 200f
 
     /**
      * Converts a maze-space position (x, y in pixels) to screen-space.

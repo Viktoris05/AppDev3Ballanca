@@ -74,5 +74,9 @@ sealed class CellBehavior {
     object RedWall : CellBehavior() {
         override fun isInRedWall() = true
     }
+    /** Represents the tile where the ball starts*/
+    object StartTile: CellBehavior(){
+
+    }
 
 }

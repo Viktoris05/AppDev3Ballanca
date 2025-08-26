@@ -53,12 +53,13 @@ fun GameCanvas(
 
                 // Color by type
                 val color = when (maze[row][col]) {
-                    CellType.EMPTY -> Color.White //change to black later once we have clear outlines for black holes
+                    CellType.EMPTY -> Color.Black
                     CellType.WALL -> accentColor
                     CellType.FINISH -> finishColor
                     CellType.SLOWDOWN -> slowdownColor
                     CellType.SPEEDUP -> speedupColor
                     CellType.REDWALL -> redWallColor
+                    CellType.STARTINGTILE -> Color.Transparent
                 }
 
                 // Draw the rectangle for the tile

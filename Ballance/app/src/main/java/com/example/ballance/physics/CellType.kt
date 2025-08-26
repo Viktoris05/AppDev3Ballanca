@@ -21,7 +21,8 @@ enum class CellType {
     FINISH,   // Goal tile; reaching this may end the level or trigger a win condition.
     SLOWDOWN,   //Slowdown tile; ball will slowdown while passing through
     SPEEDUP,    //Speedup tile; ball will speedup while passing through
-    REDWALL   //Redwall tile; reaching this will restart the level without restarting the time
+    REDWALL,   //Redwall tile; reaching this will restart the level without restarting the time
+    STARTINGTILE //Starting tile, ball starts here
 }
 
 /**
@@ -37,5 +38,6 @@ fun CellType.toBehavior(): CellBehavior = when (this) {
     CellType.SLOWDOWN -> CellBehavior.Slowdown
     CellType.SPEEDUP -> CellBehavior.Speedup
     CellType.REDWALL -> CellBehavior.RedWall
+    CellType.STARTINGTILE -> CellBehavior.StartTile
 }
 
