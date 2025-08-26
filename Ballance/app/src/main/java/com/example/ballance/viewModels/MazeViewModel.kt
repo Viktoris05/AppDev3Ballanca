@@ -49,6 +49,28 @@ class MazeViewModel : ViewModel() {
         mazeGrid[row][col].value = type
     }
 
+    /** Clears the entire grid to EMPTY (in-memory only). */
+    fun clear() {
+        for (r in 0 until rows) {
+            for (c in 0 until cols) {
+                mazeGrid[r][c].value = CellType.EMPTY
+            }
+        }
+    }
+
+    /** Replace the in-memory grid from a serializable 2D list (no disk I/O). */
+    fun setFromList(data: List<List<CellType>>) {
+        for (r in 0 until rows) {
+            for (c in 0 until cols) {
+                mazeGrid[r][c].value = data[r][c]
+            }
+        }
+    }
+
+    /** Returns a serializable snapshot of the current grid. */
+    fun toSerializable(): List<List<CellType>> =
+        mazeGrid.map { row -> row.map { it.value } }
+
     /**
      * Saves the current maze grid to local storage in JSON format.
      *
@@ -58,10 +80,7 @@ class MazeViewModel : ViewModel() {
      * @param context The Android [Context], used to open the file.
      */
     fun saveMaze(context: Context) {
-        val serializableGrid = mazeGrid.map { row ->
-            row.map { it.value } // extract the raw CellType value from each MutableState
-        }
-        val jsonString = Json.Default.encodeToString(serializableGrid)
+        val jsonString = Json.Default.encodeToString(toSerializable())
         context.openFileOutput("maze.json", Context.MODE_PRIVATE).use {
             it.write(jsonString.toByteArray())
         }
@@ -70,7 +89,7 @@ class MazeViewModel : ViewModel() {
     /**
      * Loads a previously saved maze from local storage, replacing the current grid values.
      *
-     * The saved maze must have the same 15x15 dimensions.
+     * The saved maze must have the same 16x36 dimensions.
      * Each loaded [CellType] is copied back into the corresponding [MutableState].
      *
      * @param context The Android [Context], used to read the file.
@@ -79,12 +98,7 @@ class MazeViewModel : ViewModel() {
         try {
             val jsonString = context.openFileInput("maze.json").bufferedReader().readText()
             val loaded: List<List<CellType>> = Json.Default.decodeFromString(jsonString)
-
-            for (r in 0 until rows) {
-                for (c in 0 until cols) {
-                    mazeGrid[r][c].value = loaded[r][c]
-                }
-            }
+            setFromList(loaded)
         } catch (e: Exception) {
             // Likely cause: trying to load before saving anything.
             // No fallback: keep default maze.

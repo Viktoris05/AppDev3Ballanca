@@ -1,11 +1,12 @@
 package com.example.ballance.ui.screens
 
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -13,7 +14,6 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.*
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +26,9 @@ import com.example.ballance.physics.CellType
 import com.example.ballance.viewModels.MazeViewModel
 import com.example.ballance.MusicPlayer
 import com.example.ballance.ui.theme.*
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 
 @Composable
 fun EditorScreen(
@@ -40,6 +43,34 @@ fun EditorScreen(
 
     val verticalScroll = rememberScrollState()
     val horizontalScroll = rememberScrollState()
+
+    // Import / Export via Storage Access Framework (no app-branch coupling)
+    val exportLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument("application/json")
+    ) { uri ->
+        if (uri != null) {
+            try {
+                val json = Json.Default.encodeToString(viewModel.toSerializable())
+                context.contentResolver.openOutputStream(uri)?.use { it.write(json.toByteArray()) }
+                Toast.makeText(context, "Exported JSON", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+            }
+        }
+    }
+
+    val importLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) {
+            try {
+                val json = context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() } ?: ""
+                val loaded: List<List<CellType>> = Json.Default.decodeFromString(json)
+                viewModel.setFromList(loaded)
+                Toast.makeText(context, "Imported JSON", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+            }
+        }
+    }
 
     Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFF121212)) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -76,7 +107,6 @@ fun EditorScreen(
                     .fillMaxSize()
             ) {
 
-                // Tile selection buttons
                 Column {
                     Button(
                         onClick = { selectedType = CellType.EMPTY },
@@ -84,54 +114,74 @@ fun EditorScreen(
                             containerColor = if(selectedType == CellType.EMPTY) accentColorSelected else accentColor,
                             contentColor = Color.White
                         )
-                    ) {
-                        Text("Empty")
-                    }
+                    ) { Text("Empty") }
                     Button(
                         onClick = { selectedType = CellType.WALL },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if(selectedType == CellType.WALL) accentColorSelected else accentColor,
                             contentColor = Color.White
                         )
-                    ) {
-                        Text("Wall")
-                    }
+                    ) { Text("Wall") }
                     Button(
                         onClick = { selectedType = CellType.FINISH },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if(selectedType == CellType.FINISH) accentColorSelected else accentColor,
                             contentColor = Color.White
                         )
-                    ) {
-                        Text("Finish")
-                    }
+                    ) { Text("Finish") }
                     Button(
                         onClick = { selectedType = CellType.SLOWDOWN },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if(selectedType == CellType.SLOWDOWN) accentColorSelected else accentColor,
                             contentColor = Color.White
                         )
-                    ) {
-                        Text("Slowdown")
-                    }
+                    ) { Text("Slowdown") }
                     Button(
                         onClick = { selectedType = CellType.SPEEDUP },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if(selectedType == CellType.SPEEDUP) accentColorSelected else accentColor,
                             contentColor = Color.White
                         )
-                    ) {
-                        Text("Speedup")
-                    }
+                    ) { Text("Speedup") }
                     Button(
                         onClick = { selectedType = CellType.REDWALL },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if(selectedType == CellType.REDWALL) accentColorSelected else accentColor,
                             contentColor = Color.White
                         )
-                    ) {
-                        Text("Red Wall")
-                    }
+                    ) { Text("Red Wall") }
+
+                    Spacer(modifier = Modifier.size(12.dp))
+
+                    Button(
+                        onClick = {
+                            viewModel.clear()
+                            Toast.makeText(context, "New blank grid", Toast.LENGTH_SHORT).show()
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = accentColor,
+                            contentColor = Color.White
+                        )
+                    ) { Text("New (Blank)") }
+
+                    Spacer(modifier = Modifier.size(12.dp))
+
+                    // Import/Export JSON (design and later copy into res/raw in main branch)
+                    Button(
+                        onClick = { importLauncher.launch(arrayOf("application/json","text/*")) },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = accentColor,
+                            contentColor = Color.White
+                        )
+                    ) { Text("Import JSON") }
+
+                    Button(
+                        onClick = { exportLauncher.launch("level01.json") },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = accentColor,
+                            contentColor = Color.White
+                        )
+                    ) { Text("Export JSON") }
                 }
 
                 // Maze grid display
@@ -160,39 +210,35 @@ fun EditorScreen(
                                     }
                                     change.consume()
                                 })
-
                         }
                 ) {
-                Row {
-                    for (col in 0 until viewModel.cols) {
-                        Column {
-                            for (row in 0 until viewModel.rows) {
-                                val cellState = mazeGrid[row][col]
-                                val cellType by cellState
+                    Row {
+                        for (col in 0 until viewModel.cols) {
+                            Column {
+                                for (row in 0 until viewModel.rows) {
+                                    val cellState = mazeGrid[row][col]
+                                    val cellType by cellState
 
-                                Box(
-                                    modifier = Modifier
-                                        .size(19.dp)
-                                        .background(
-                                            when (cellType) {
-                                                CellType.EMPTY -> Color.White
-                                                CellType.WALL -> accentColor
-                                                CellType.FINISH -> finishColor
-                                                CellType.SLOWDOWN -> slowdownColor
-                                                CellType.SPEEDUP -> speedupColor
-                                                CellType.REDWALL -> redWallColor
-                                            }
-                                        )
-                                        .border(1.dp, Color.Gray)
-
-                                )
+                                    Box(
+                                        modifier = Modifier
+                                            .size(19.dp)
+                                            .background(
+                                                when (cellType) {
+                                                    CellType.EMPTY -> Color.White
+                                                    CellType.WALL -> accentColor
+                                                    CellType.FINISH -> finishColor
+                                                    CellType.SLOWDOWN -> slowdownColor
+                                                    CellType.SPEEDUP -> speedupColor
+                                                    CellType.REDWALL -> redWallColor
+                                                }
+                                            )
+                                            .border(1.dp, Color.Gray)
+                                    )
+                                }
                             }
                         }
                     }
                 }
-            }
-
-
 
                 Column{
                     Button(
@@ -203,9 +249,7 @@ fun EditorScreen(
                             containerColor = accentColor,
                             contentColor = Color.White
                         )
-                    ) {
-                        Text("Save Maze")
-                    }
+                    ) { Text("Save Maze") }
 
                     Spacer(modifier = Modifier.size(5.dp))
 
@@ -217,9 +261,7 @@ fun EditorScreen(
                             containerColor = accentColor,
                             contentColor = Color.White
                         )
-                    ) {
-                        Text("Load Maze")
-                    }
+                    ) { Text("Load Maze") }
 
                     Spacer(modifier = Modifier.size(5.dp))
 
@@ -229,12 +271,9 @@ fun EditorScreen(
                             containerColor = accentColor,
                             contentColor = Color.White
                         )
-                    ) {
-                        Text("Back to Menu")
-                    }
+                    ) { Text("Back to Menu") }
                 }
             }
-
         }
     }
 }
