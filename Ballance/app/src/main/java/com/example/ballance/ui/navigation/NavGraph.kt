@@ -15,6 +15,7 @@ sealed class Screen(val route: String) {
     object LevelSelect : Screen("level_select")
     object Editor : Screen("editor")
     object Info : Screen("info")
+    object Victory: Screen("victory")
 }
 
 @Composable
@@ -37,5 +38,7 @@ fun AppNavHost(navController: NavHostController) {
         composable(Screen.Info.route) {
             InfoScreen(navController)
         }
+        composable(Screen.Victory.route) { VictoryScreen(navController) }
+
     }
 }
