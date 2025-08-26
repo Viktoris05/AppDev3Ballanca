@@ -51,10 +51,6 @@ fun VictoryScreen(navController: NavController) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Zurück", tint = Color.White)
-                    }
-
                     IconButton(
                         onClick = {
                             MusicPlayer.toggle(context)

@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -16,6 +17,8 @@ import androidx.navigation.NavController
 import com.example.ballance.ui.screens.utilities.GameCanvas
 import com.example.ballance.MusicPlayer
 import com.example.ballance.Utilities.TiltSensorHandler
+import com.example.ballance.physics.CellBehavior
+import com.example.ballance.ui.navigation.Screen
 import com.example.ballance.ui.theme.accentColor
 import com.example.ballance.ui.theme.backgroundColor
 import com.example.ballance.viewModels.GameViewModel
@@ -40,6 +43,12 @@ fun GameScreen(
     val context = LocalContext.current
     var isPlaying by remember { mutableStateOf(MusicPlayer.isPlaying) }
 
+    // control flag for the game loop
+    var gameActive by rememberSaveable { mutableStateOf(true) }
+
+    // Prevent duplicate navigations to Victory
+    var navigated by rememberSaveable { mutableStateOf(false) }
+
     // Sensor listener to track tilt (acceleration)
     val sensorHandler = remember { TiltSensorHandler(context) }
 
@@ -47,6 +56,29 @@ fun GameScreen(
     DisposableEffect(sensorHandler) {
         sensorHandler.register()
         onDispose { sensorHandler.unregister() }
+    }
+
+    //victory navigation callback
+    val navigateToVictory by rememberUpdatedState {
+        if (navigated) return@rememberUpdatedState
+        navigated = true
+
+        //hard stop the game and sensors before navigating to prevent it running in the background
+        gameActive = false
+        sensorHandler.unregister()
+
+        navController.navigate(Screen.Victory.route) {
+            // Ensure back goes straight to Main Menu
+            popUpTo(Screen.MainMenu.route) { inclusive = false } // keep MainMenu underneaeth
+            launchSingleTop = true      // dont stack multiple Victories
+            restoreState = false
+        }
+    }
+
+    DisposableEffect(Unit) {
+        val prev = CellBehavior.Finish.onVictoryCallback
+        CellBehavior.Finish.onVictoryCallback = { navigateToVictory() }
+        onDispose { CellBehavior.Finish.onVictoryCallback = prev }
     }
 
     // Load maze and dimensions
@@ -60,13 +92,16 @@ fun GameScreen(
 
     // Launch a coroutine that starts when this Composable is composed.
     // This will run our real-time physics update loop (60fps-like).
-    LaunchedEffect(Unit) {
+    LaunchedEffect(gameActive) {
+        // If the game is not active, do not start the loop
+        if (!gameActive) return@LaunchedEffect
+
         // Get the timestamp of the current frame (in nanoseconds).
         // This "primes" the loop so we can measure deltaTime on the next frame.
         var lastFrameTime = withFrameNanos { it }
 
-        // Start an infinite loop: this will run once per frame.
-        while (true) {
+        // Start a loop that runs only while the game is active.
+        while (gameActive) {
             // Suspend until the next screen refresh.
             // 'now' is the timestamp of the current frame in nanoseconds.
             withFrameNanos { now ->
@@ -97,13 +132,9 @@ fun GameScreen(
                 // Read latest velocity for debug display
                 velocityX = viewModel.getVelocityX()
                 velocityY = viewModel.getVelocityY()
-
             }
         }
-
     }
-
-
 
     Surface(modifier = Modifier.fillMaxSize(), color = backgroundColor) {
         Column(modifier = Modifier.fillMaxSize()) {
