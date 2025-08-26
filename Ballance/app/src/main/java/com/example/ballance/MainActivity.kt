@@ -48,7 +48,12 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         MusicPlayer.stop()
+        super.onDestroy()
+    }
+
+    override fun onPause() {
+        MusicPlayer.stop()
+        super.onPause()
     }
 }
