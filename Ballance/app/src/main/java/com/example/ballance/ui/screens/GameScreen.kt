@@ -198,7 +198,7 @@ fun GameScreen(
                                 //Restart Level
                                 Button(onClick = {
                                     isPaused = false
-                                    navController.navigate(Screen.Game.route)
+                                    viewModel.loadMaze()
                                                  },
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = accentColor,
