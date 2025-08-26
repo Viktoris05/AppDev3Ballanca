@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material.icons.filled.VolumeUp
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -87,7 +88,11 @@ fun VictoryScreen(navController: NavController) {
                 ) {
                     Button(
                         onClick = { navController.navigate(Screen.MainMenu.route) },
-                        modifier = Modifier.fillMaxWidth(0.8f)
+                        modifier = Modifier.fillMaxWidth(0.8f),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = accentColor,
+                            contentColor = Color.White
+                        )
                     ) {
                         Text("Zurück zum Menü")
                     }
@@ -95,8 +100,14 @@ fun VictoryScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Button(
-                        onClick = { /* TODO: nächstes Level oder Neustart */ },
-                        modifier = Modifier.fillMaxWidth(0.8f)
+                        onClick = {
+                            navController.popBackStack() //lösche die vorherige Instanz
+                            navController.navigate(Screen.Game.route) },
+                        modifier = Modifier.fillMaxWidth(0.8f),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = accentColor,
+                            contentColor = Color.White
+                    )
                     ) {
                         Text("Nochmal spielen")
                     }
