@@ -1,5 +1,8 @@
 package com.example.ballance.ui.screens
+import android.R
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.VolumeOff
@@ -89,6 +92,7 @@ fun GameScreen(
     // Track ball position in world-space pixels (stateful for Compose redraw)
     var ballX by remember { mutableStateOf(viewModel.ballX) }
     var ballY by remember { mutableStateOf(viewModel.ballY) }
+    var isPaused by remember {mutableStateOf(false)}
 
     // Launch a coroutine that starts when this Composable is composed.
     // This will run our real-time physics update loop (60fps-like).
@@ -116,54 +120,29 @@ fun GameScreen(
                 val ax = sensorHandler.tiltX
                 val ay = sensorHandler.tiltY
 
-                // Step the physics simulation with the tilt input and time delta.
-                // The ViewModel runs the physics and gives us the updated position.
-                val (newX, newY) = viewModel.update(
-                    ax = ax,
-                    ay = ay,
-                    cellSize = cellSize,
-                    deltaTime = dt
-                )
+                if(!isPaused) {
+                    // Step the physics simulation with the tilt input and time delta.
+                    // The ViewModel runs the physics and gives us the updated position.
+                    val (newX, newY) = viewModel.update(
+                        ax = ax,
+                        ay = ay,
+                        cellSize = cellSize,
+                        deltaTime = dt
+                    )
 
-                // Save the updated position into Compose state.
-                // This triggers recomposition and redraw of the ball on screen.
-                ballX = newX
-                ballY = newY
-                // Read latest velocity for debug display
-                velocityX = viewModel.getVelocityX()
-                velocityY = viewModel.getVelocityY()
+                    // Save the updated position into Compose state.
+                    // This triggers recomposition and redraw of the ball on screen.
+                    ballX = newX
+                    ballY = newY
+                    // Read latest velocity for debug display
+                    velocityX = viewModel.getVelocityX()
+                    velocityY = viewModel.getVelocityY()
+                }
             }
         }
     }
 
     Surface(modifier = Modifier.fillMaxSize(), color = backgroundColor) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            // Top bar with Back and Music toggle
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
-                }
-
-                IconButton(
-                    onClick = {
-                        MusicPlayer.toggle(context)
-                        isPlaying = MusicPlayer.isPlaying
-                    }
-                ) {
-                    Icon(
-                        imageVector = if (isPlaying) Icons.Filled.VolumeUp else Icons.Filled.VolumeOff,
-                        contentDescription = "Music",
-                        tint = Color.White
-                    )
-                }
-            }
-
             Box(modifier = Modifier.fillMaxSize()) {
                 // Maze and ball rendering
                 GameCanvas(
@@ -173,6 +152,73 @@ fun GameScreen(
                     cellSize = cellSize
                 )
 
+                if(isPaused){
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.7f)), //make background more dim
+                        contentAlignment = Alignment.Center
+                    ){
+                        Column(
+                            modifier = Modifier
+                                .background(backgroundColor)
+                                .padding(24.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp))
+                            {
+                                //Music toggle
+                                IconButton(
+                                    onClick = {
+                                        MusicPlayer.toggle(context)
+                                        isPlaying = MusicPlayer.isPlaying
+                                    },
+                                    modifier = Modifier.size(15.dp).align(Alignment.End)
+                                ) {
+                                    Icon(
+                                        imageVector = if (isPlaying) Icons.Filled.VolumeUp else Icons.Filled.VolumeOff,
+                                        contentDescription = "Musik umschalten",
+                                        tint = Color.White,
+                                        modifier = Modifier.fillMaxSize()
+                                    )
+                                }
+
+                                Text("Level: (Name)", color = Color.White)
+                                Text("Highscore: (Time)", color = Color.White)
+                                Text("Current Score: (Time)", color = Color.White)
+
+                                //Resume button
+                                Button(onClick = {isPaused = false},
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = accentColor,
+                                        contentColor = Color.White)) {
+                                    Text("Resume")
+                                }
+
+
+                                //Restart Level
+                                Button(onClick = {
+                                    isPaused = false
+                                    navController.navigate(Screen.Game.route)
+                                                 },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = accentColor,
+                                        contentColor = Color.White
+                                    )) {
+                                    Text("Restart level")
+                                }
+
+                                //Back to Menu
+                                Button(onClick = { navController.popBackStack() },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = accentColor,
+                                        contentColor = Color.White
+                                    )) {
+                                    Text("Back to Menu")
+                                }
+                            }
+                    }
+                }
+
                 // Debug overlay in upper-right
                 Column(
                     modifier = Modifier
@@ -181,6 +227,19 @@ fun GameScreen(
                     horizontalAlignment = Alignment.End,
                     verticalArrangement = Arrangement.Top
                 ) {
+
+                    //Pause/Resume Button
+                    Button(
+                        onClick = {if(!isPaused) {isPaused = true}else{isPaused = false} },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = accentColor,
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier.padding(16.dp))
+                    {
+                        Text(if(!isPaused){("II")}else{("▶")})
+                    }
+
                     //debug values on screen
                     fun Float.format(digits: Int): String = "%.${digits}f".format(this)
 
@@ -192,23 +251,6 @@ fun GameScreen(
                     Text("ycor: ${ballY.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
                 }
 
-                // "Back to Menu" button in lower-center
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.Bottom,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Button(onClick = { navController.popBackStack() },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = accentColor,
-                            contentColor = Color.White
-                        )) {
-                        Text("Back to Menu")
-                    }
-                }
             }
-        }
     }
 }
