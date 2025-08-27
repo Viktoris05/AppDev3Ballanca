@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.IntSize
 import com.example.ballance.physics.CellType
 import com.example.ballance.ui.theme.accentColor
@@ -70,6 +71,18 @@ fun GameCanvas(
                 )
             }
         }
+
+        //visible border around the maze area
+        val mazeTopLeft = mapper.cellTopLeft(0, 0)
+        val cellPx = mapper.cellSize()
+        val mazeWidth = cellPx.width * maze[0].size
+        val mazeHeight = cellPx.height * maze.size
+        drawRect(
+            color = Color.White,
+            topLeft = mazeTopLeft,
+            size = androidx.compose.ui.geometry.Size(mazeWidth, mazeHeight),
+            style = Stroke(width = 4f)
+        )
 
         // Draw the ball at its screen-mapped position
         val ballCenter = mapper.toScreen(ballX, ballY)

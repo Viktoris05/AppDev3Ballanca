@@ -145,6 +145,21 @@ abstract class BaseMazePhysics(
     ) {
         val tentativeX = pos.x + velocityX
 
+        // world bounds check
+        val minX = ballRadius
+        val maxX = cols * cellSize - ballRadius
+        if (tentativeX < minX) {
+            pos.x = minX
+            velocityX *= -0.4f
+            return
+        }
+        if (tentativeX > maxX) {
+            pos.x = maxX
+            velocityX *= -0.4f
+            return
+        }
+
+
         // Which rows the ball touches
         val topRow = ((pos.y - ballRadius) / cellSize).toInt().coerceIn(0, rows - 1)
         val bottomRow = ((pos.y + ballRadius) / cellSize).toInt().coerceIn(0, rows - 1)
@@ -180,6 +195,22 @@ abstract class BaseMazePhysics(
         cols: Int
     ) {
         val tentativeY = pos.y + velocityY
+
+        // world bounds check
+        val minY = ballRadius
+        val maxY = rows * cellSize - ballRadius
+        if (tentativeY < minY) {
+            pos.y = minY
+            velocityY *= -0.4f
+            return
+        }
+        if (tentativeY > maxY) {
+            pos.y = maxY
+            velocityY *= -0.4f
+            return
+        }
+
+
 
         // Which columns the ball overlaps
         val leftCol = ((pos.x - ballRadius) / cellSize).toInt().coerceIn(0, cols - 1)
@@ -239,7 +270,7 @@ abstract class BaseMazePhysics(
         val touchedRedWall = (redWall(maze[topRow][leftCol],maze[bottomRow][rightCol]))
 
         if(touchedRedWall){
-            //  use provided respawn if available else center ---
+            //  use provided respawn if available else center
             val rx = respawnX
             val ry = respawnY
             if (rx != null && ry != null) {
