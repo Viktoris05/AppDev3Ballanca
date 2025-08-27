@@ -54,6 +54,38 @@ fun EditorScreen(
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(Icons.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
                 }
+
+                // save/load buttons now in the top bar, back to menu redundant
+                Row(
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(
+                        onClick = {
+                            viewModel.saveMaze(context)
+                            Toast.makeText(context, "Maze saved!", Toast.LENGTH_SHORT).show()
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = accentColor,
+                            contentColor = Color.White
+                        )
+                    ) { Text("Save Maze") }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Button(
+                        onClick = {
+                            viewModel.loadMaze(context)
+                            Toast.makeText(context, "Maze loaded!", Toast.LENGTH_SHORT).show()
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = accentColor,
+                            contentColor = Color.White
+                        )
+                    ) { Text("Load Maze") }
+                }
+
                 IconButton(
                     onClick = {
                         MusicPlayer.toggle(context)
@@ -163,79 +195,36 @@ fun EditorScreen(
 
                         }
                 ) {
-                Row {
-                    for (col in 0 until viewModel.cols) {
-                        Column {
-                            for (row in 0 until viewModel.rows) {
-                                val cellState = mazeGrid[row][col]
-                                val cellType by cellState
+                    Row {
+                        for (col in 0 until viewModel.cols) {
+                            Column {
+                                for (row in 0 until viewModel.rows) {
+                                    val cellState = mazeGrid[row][col]
+                                    val cellType by cellState
 
-                                Box(
-                                    modifier = Modifier
-                                        .size(19.dp)
-                                        .background(
-                                            when (cellType) {
-                                                CellType.EMPTY -> Color.White
-                                                CellType.WALL -> accentColor
-                                                CellType.FINISH -> finishColor
-                                                CellType.SLOWDOWN -> slowdownColor
-                                                CellType.SPEEDUP -> speedupColor
-                                                CellType.REDWALL -> redWallColor
-                                                CellType.STARTINGTILE -> Color.DarkGray
-                                            }
-                                        )
-                                        .border(1.dp, Color.Gray)
+                                    Box(
+                                        modifier = Modifier
+                                            .size(19.dp)
+                                            .background(
+                                                when (cellType) {
+                                                    CellType.EMPTY -> Color.White
+                                                    CellType.WALL -> accentColor
+                                                    CellType.FINISH -> finishColor
+                                                    CellType.SLOWDOWN -> slowdownColor
+                                                    CellType.SPEEDUP -> speedupColor
+                                                    CellType.REDWALL -> redWallColor
+                                                    CellType.STARTINGTILE -> Color.DarkGray
+                                                }
+                                            )
+                                            .border(1.dp, Color.Gray)
 
-                                )
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
-
-
-
-                Column{
-                    Button(
-                        onClick = {
-                            viewModel.saveMaze(context)
-                            Toast.makeText(context, "Maze saved!", Toast.LENGTH_SHORT).show()
-                        }, colors = ButtonDefaults.buttonColors(
-                            containerColor = accentColor,
-                            contentColor = Color.White
-                        )
-                    ) {
-                        Text("Save Maze")
-                    }
-
-                    Spacer(modifier = Modifier.size(5.dp))
-
-                    Button(
-                        onClick = {
-                            viewModel.loadMaze(context)
-                            Toast.makeText(context, "Maze loaded!", Toast.LENGTH_SHORT).show()
-                        }, colors = ButtonDefaults.buttonColors(
-                            containerColor = accentColor,
-                            contentColor = Color.White
-                        )
-                    ) {
-                        Text("Load Maze")
-                    }
-
-                    Spacer(modifier = Modifier.size(5.dp))
-
-                    Button(
-                        onClick = { navController.popBackStack() },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = accentColor,
-                            contentColor = Color.White
-                        )
-                    ) {
-                        Text("Back to Menu")
-                    }
-                }
-            }
-
         }
     }
 }

@@ -28,13 +28,22 @@ class WorldToScreenMapper(
     private val numCols: Int,
     private val numRows: Int
 ) {
+    // Compute a screen cell size that fits the whole maze on the canvas
+    private val fitCell = minOf(
+        canvasSize.width / numCols.toFloat(),
+        canvasSize.height / numRows.toFloat()
+    )
+
+    // World -> screen scale (applied to world cellSize)
+    private val scale = fitCell / cellSize
+
     // Total maze width/height in pixels
-    private val mazeWidth = numRows * cellSize
-    private val mazeHeight = numCols * cellSize
+    private val mazeWidth = numCols * cellSize * scale
+    private val mazeHeight = numRows * cellSize * scale
 
     // Offset to center the maze in the available canvas
-    private val offsetX = 0 //(canvasSize.width - mazeWidth) / 2f (old value)
-    private val offsetY = (canvasSize.height - mazeHeight) / 200f
+    private val offsetX = (canvasSize.width - mazeWidth) / 2f
+    private val offsetY = (canvasSize.height - mazeHeight) / 2f
 
     /**
      * Converts a maze-space position (x, y in pixels) to screen-space.
@@ -46,7 +55,7 @@ class WorldToScreenMapper(
      * @return A screen-space Offset used for drawing on Canvas.
      */
     fun toScreen(x: Float, y: Float): Offset {
-        return Offset(x + offsetX, y + offsetY)
+        return Offset(x * scale + offsetX, y * scale + offsetY)
     }
 
     /**
@@ -59,8 +68,8 @@ class WorldToScreenMapper(
      * @return A screen-space Offset for the top-left corner of the cell.
      */
     fun cellTopLeft(row: Int, col: Int): Offset {
-        val left = col * cellSize + offsetX
-        val top = row * cellSize + offsetY
+        val left = col * cellSize * scale + offsetX
+        val top = row * cellSize * scale + offsetY
         return Offset(left, top)
     }
 
@@ -71,5 +80,5 @@ class WorldToScreenMapper(
      *
      * @return A `Size` object with width and height equal to cellSize.
      */
-    fun cellSize(): Size = Size(cellSize, cellSize)
+    fun cellSize(): Size = Size(cellSize * scale, cellSize * scale)
 }

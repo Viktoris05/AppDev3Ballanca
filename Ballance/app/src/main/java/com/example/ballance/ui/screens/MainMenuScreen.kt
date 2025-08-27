@@ -1,6 +1,7 @@
 package com.example.ballance.ui.screens
 
 import android.content.res.Configuration
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -33,6 +34,29 @@ import com.example.ballance.MusicPlayer
 import com.example.ballance.R
 import com.example.ballance.ui.navigation.Screen
 import com.example.ballance.ui.theme.*
+
+// added
+import com.example.ballance.utilities.LevelPack
+import com.example.ballance.utilities.LevelTimesStore
+import com.example.ballance.utilities.LevelSession
+import com.example.ballance.physics.CellType
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+
+// helper to start first unbeaten level (or Level 1)
+private fun startUnbeatenOrFirst(context: Context, navController: NavController) {
+    val targetIndex = LevelPack.entries
+        .firstOrNull { LevelTimesStore.getBestTime(context, it.index) == null }
+        ?.index ?: LevelPack.entries.first().index
+
+    val data: List<List<CellType>> = LevelPack.load(context, targetIndex)
+    val jsonString = Json.Default.encodeToString(data)
+    context.openFileOutput("maze.json", Context.MODE_PRIVATE).use {
+        it.write(jsonString.toByteArray())
+    }
+    LevelSession.currentLevelIndex = targetIndex
+    navController.navigate(Screen.Game.route)
+}
 
 @Composable
 fun MainMenuScreen(navController: NavController) {
@@ -107,7 +131,7 @@ fun MainMenuScreen(navController: NavController) {
                     widthFraction = buttonWidthFraction,
                     verticalPadding = buttonVerticalPadding,
                     textSize = buttonTextSize
-                ) { navController.navigate(Screen.Game.route) }
+                ) { startUnbeatenOrFirst(context, navController) }
 
                 MenuButton(
                     text = "Level Auswählen",
