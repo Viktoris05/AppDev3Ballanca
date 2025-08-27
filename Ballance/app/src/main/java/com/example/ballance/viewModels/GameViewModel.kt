@@ -1,10 +1,13 @@
 package com.example.ballance.viewModels
 
 import android.app.Application
+import android.os.SystemClock
 import androidx.lifecycle.AndroidViewModel
 import com.example.ballance.physics.CellType
 import com.example.ballance.physics.TiltGravityPhysics
 import kotlinx.serialization.json.Json
+import com.example.ballance.utilities.LevelTimesStore
+import com.example.ballance.utilities.LevelSession
 
 /**
  * ViewModel for the game screen.
@@ -33,6 +36,12 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     var ballY = 0f
         private set
 
+    // imer state (per run)
+    // Uses elapsedRealtime so it survives frame dropping and isnt tied to frame dt.
+    private var timerRunning = false
+    private var timerStartRealtime = 0L
+    private var timerAccumulatedMs = 0L
+
     init {
         loadMaze()
     }
@@ -57,6 +66,9 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         physics = TiltGravityPhysics(ballRadius = cellSize / 2.5f)
         ballX = cellSize * (maze[0].size / 2)
         ballY = cellSize * (maze.size / 2)
+
+        // Reset run timer for the (re)loaded level; GameScreen resumes it when unpaused.
+        resetTimer()
     }
 
     /**
@@ -102,4 +114,64 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     /** Returns the ball's current vertical velocity (px/s). */
     fun getVelocityY() = if (::physics.isInitialized) physics.velocityY else 0f
+
+    // timer additions lowkey api used by game screen
+
+    /** Total elapsed run time in milliseconds (pause-aware). */
+    fun getElapsedMillis(): Long {
+        return if (timerRunning) {
+            timerAccumulatedMs + (SystemClock.elapsedRealtime() - timerStartRealtime)
+        } else {
+            timerAccumulatedMs
+        }
+    }
+
+    /** Resume counting time. */
+    fun resumeTimer() {
+        if (!timerRunning) {
+            timerRunning = true
+            timerStartRealtime = SystemClock.elapsedRealtime()
+        }
+    }
+
+    /** Pause counting time. */
+    fun pauseTimer() {
+        if (timerRunning) {
+            timerAccumulatedMs += SystemClock.elapsedRealtime() - timerStartRealtime
+            timerRunning = false
+        }
+    }
+
+    /** Reset timer to 0 and set paused. */
+    fun resetTimer() {
+        timerRunning = false
+        timerStartRealtime = 0L
+        timerAccumulatedMs = 0L
+    }
+
+    /**
+     * Called when the Finish tile is reached (from GameScreen before navigation).
+     * - Freezes the timer and stores the last run in LevelSession.
+     * - Updates best time (packaged levels 1..10 only).
+     */
+    fun markVictory() {
+        // freeze timer
+        pauseTimer()
+
+        val elapsed = getElapsedMillis()
+        LevelSession.lastRunMillis = elapsed
+
+        val idx = LevelSession.currentLevelIndex
+        if (idx != null && idx in 1..10) {
+            LevelTimesStore.recordIfBest(context, idx, elapsed)
+        }
+    }
+
+    /** For pause UI: best time for current packaged level, or null. */
+    fun getBestTimeForCurrent(): Long? {
+        val idx = LevelSession.currentLevelIndex
+        return if (idx != null && idx in 1..10) {
+            LevelTimesStore.getBestTime(context, idx)
+        } else null
+    }
 }
