@@ -48,7 +48,10 @@ object BallMovementStore {
      * @param levelIndex 1..10
      */
     fun loadBestMovement(context: Context, levelIndex: Int?) {
-        if (!isTrackableLevel(levelIndex)) return
+        if (!isTrackableLevel(levelIndex)){
+            bestMovement = Array(size) {null}
+            return
+        }
         val fileName = "BestTrackLevel$levelIndex"
         val file = File(context.filesDir, fileName)
         if(!file.exists()) {

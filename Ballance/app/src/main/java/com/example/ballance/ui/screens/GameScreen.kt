@@ -321,13 +321,13 @@ fun GameScreen(
 
                 //debug values on screen
                 fun Float.format(digits: Int): String = "%.${digits}f".format(this)
-
-                Text("ax: ${sensorHandler.tiltX.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
-                Text("ay: ${sensorHandler.tiltY.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
-                Text("vx: ${velocityX.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
-                Text("vy: ${velocityY.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
-                Text("xcor: ${ballX.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
-                Text("ycor: ${ballY.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+                    //remove debug
+//                Text("ax: ${sensorHandler.tiltX.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+//                Text("ay: ${sensorHandler.tiltY.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+//                Text("vx: ${velocityX.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+//                Text("vy: ${velocityY.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+//                Text("xcor: ${ballX.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+//                Text("ycor: ${ballY.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
             }
 
         }

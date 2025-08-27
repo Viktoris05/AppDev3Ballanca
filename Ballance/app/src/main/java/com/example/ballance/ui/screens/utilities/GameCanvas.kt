@@ -80,7 +80,7 @@ fun GameCanvas(
         val mazeWidth = cellPx.width * maze[0].size
         val mazeHeight = cellPx.height * maze.size
         drawRect(
-            color = Color.White,
+            color = accentColor,
             topLeft = mazeTopLeft,
             size = androidx.compose.ui.geometry.Size(mazeWidth, mazeHeight),
             style = Stroke(width = 4f)
