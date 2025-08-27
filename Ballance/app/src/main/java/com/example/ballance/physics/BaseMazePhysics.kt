@@ -16,7 +16,7 @@ import kotlin.math.pow
  *  1. applyPhysics:      integrate acceleration and apply friction
  *  2. resolveHorizontal: move left/right and handle wall collision
  *  3. resolveVertical:   move up/down and handle floor/ceiling collision
- *  4. triggerEffect:     call the onEnter() function of the current tile
+ *  4. triggerEffect:     call the onEnter() function of the current tile !! Discarded, causes confusion
  *
  * Subclasses can override any of these phases.
  *
@@ -41,6 +41,14 @@ abstract class BaseMazePhysics(
 
     /** Simple mutable 2D position holder */
     data class Pos(var x: Float, var y: Float)
+
+    //respawn point provided by the game (pixels) ---
+    private var respawnX: Float? = null
+    private var respawnY: Float? = null
+    fun setRespawn(x: Float, y: Float) {
+        respawnX = x
+        respawnY = y
+    }
 
     /**
      * Full simulation step for a single frame.
@@ -231,8 +239,16 @@ abstract class BaseMazePhysics(
         val touchedRedWall = (redWall(maze[topRow][leftCol],maze[bottomRow][rightCol]))
 
         if(touchedRedWall){
-            pos.x = cellSize * (maze[0].size / 2)
-            pos.y = cellSize * (maze.size / 2)
+            //  use provided respawn if available else center ---
+            val rx = respawnX
+            val ry = respawnY
+            if (rx != null && ry != null) {
+                pos.x = rx
+                pos.y = ry
+            } else {
+                pos.x = cellSize * (maze[0].size / 2)
+                pos.y = cellSize * (maze.size / 2)
+            }
         }
     }
 
