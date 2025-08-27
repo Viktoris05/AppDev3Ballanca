@@ -1,10 +1,13 @@
 package com.example.ballance.utilities
 
 import android.content.Context
+import android.util.Log
 import com.example.ballance.physics.BaseMazePhysics
 import java.io.DataOutputStream
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 
 /**
@@ -18,13 +21,21 @@ object BallMovementStore {
     private fun key(levelIndex: Int) = "best_ms_level_$levelIndex"
 
     /** True only for packaged levels we track. */
-    private fun isTrackableLevel(levelIndex: Int) = levelIndex in 1..10
+    private fun isTrackableLevel(levelIndex: Int?) = levelIndex in 1..10
 
-    val movementStore:Array<Pair<Float, Float>?> = Array(600000){ null }
+    val movementStore:Array<Pair<Float, Float>?> = Array(60000){ null }
+    var bestMovement:Array<Pair<Float, Float>?> = Array(60000){ null }
 
 
     fun addMovement(elapsedTime: Long, pos: Pair<Float, Float>){
-        movementStore[elapsedTime.toInt()] = pos
+        movementStore[elapsedTime.toInt()/10] = pos
+        Log.d("BallMovementStore", "Add with $elapsedTime: $pos")
+    }
+
+    fun getGhostMovement(elapsedTime: Long): Pair<Float, Float>? {
+        val pos = bestMovement[elapsedTime.toInt()/10]
+        Log.d("BallMovementStore", "Load with $elapsedTime: $pos")
+        return pos
     }
 
     /**
@@ -32,10 +43,22 @@ object BallMovementStore {
      *
      * @param levelIndex 1..10
      */
-    fun loadBestMovement(context: Context, levelIndex: Int): Long? {
-        if (!isTrackableLevel(levelIndex)) return null
-        val stored = prefs(context).getLong(key(levelIndex), -1L)
-        return if (stored >= 0) stored else null
+    fun loadBestMovement(context: Context, levelIndex: Int?) {
+        if (!isTrackableLevel(levelIndex)) return
+        val fileName = "BestTrackLevel$levelIndex"
+        val file = File(context.filesDir, fileName)
+        if(!file.exists()) {
+            bestMovement = Array(60000) {null}
+        }else {
+            ObjectInputStream(FileInputStream(file)).use { ois ->
+                bestMovement = ois.readObject() as Array<Pair<Float, Float>?>
+            }
+            for(i in 1..60000 - 1){
+                if(bestMovement[i] == null){
+                    bestMovement[i] = bestMovement[i - 1]
+                }
+            }
+        }
     }
 
     /**

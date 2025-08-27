@@ -3,8 +3,10 @@ package com.example.ballance.viewModels
 import android.app.Application
 import android.os.SystemClock
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.application
 import com.example.ballance.physics.CellType
 import com.example.ballance.physics.TiltGravityPhysics
+import com.example.ballance.utilities.BallMovementStore
 import kotlinx.serialization.json.Json
 import com.example.ballance.utilities.LevelTimesStore
 import com.example.ballance.utilities.LevelSession
@@ -92,6 +94,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             ballY = centerY
             physics.setRespawn(centerX, centerY)
         }
+
+        BallMovementStore.loadBestMovement(context, LevelSession.currentLevelIndex)
 
         // Reset run timer for the (re)loaded level; GameScreen resumes it when unpaused.
         resetTimer()

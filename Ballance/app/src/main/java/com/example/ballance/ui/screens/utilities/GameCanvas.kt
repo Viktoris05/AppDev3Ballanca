@@ -32,6 +32,8 @@ fun GameCanvas(
     maze: Array<Array<CellType>>,
     ballX: Float,
     ballY: Float,
+    ghostX: Float,
+    ghostY: Float,
     cellSize: Float
 ) {
     Canvas(Modifier.fillMaxSize()) {
@@ -82,6 +84,14 @@ fun GameCanvas(
             topLeft = mazeTopLeft,
             size = androidx.compose.ui.geometry.Size(mazeWidth, mazeHeight),
             style = Stroke(width = 4f)
+        )
+
+        //Draw the Ghost ball
+        val ghostCenter = mapper.toScreen(ghostX, ghostY)
+        drawCircle(
+            color = Color.LightGray,
+            radius = cellSize / 2.5f, // ball is smaller than a cell
+            center = ghostCenter
         )
 
         // Draw the ball at its screen-mapped position

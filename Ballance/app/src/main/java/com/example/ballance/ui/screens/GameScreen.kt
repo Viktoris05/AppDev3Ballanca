@@ -94,6 +94,8 @@ fun GameScreen(
     // Track ball position in world-space pixels (stateful for Compose redraw)
     var ballX by remember { mutableStateOf(viewModel.ballX) }
     var ballY by remember { mutableStateOf(viewModel.ballY) }
+    var ghostX by remember { mutableStateOf(0f) }
+    var ghostY by remember { mutableStateOf(0f) }
     var isPaused by remember { mutableStateOf(false) }
     var outOfTime by remember { mutableStateOf(false) }
 
@@ -166,6 +168,13 @@ fun GameScreen(
                     ballX = newX
                     ballY = newY
 
+                    val newGhostPos = BallMovementStore.getGhostMovement(elapsedMs)
+
+                    if(newGhostPos != null){
+                        ghostX = newGhostPos.first
+                        ghostY = newGhostPos.second
+                    }
+
                     //track latest ball movements
                     BallMovementStore.addMovement(elapsedMs,Pair(ballX, ballY))
 
@@ -184,6 +193,8 @@ fun GameScreen(
                 maze = maze,
                 ballX = ballX,
                 ballY = ballY,
+                ghostX = ghostX,
+                ghostY = ghostY,
                 cellSize = cellSize
             )
 
