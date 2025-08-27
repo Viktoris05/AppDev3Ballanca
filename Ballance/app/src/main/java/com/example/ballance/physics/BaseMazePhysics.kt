@@ -312,8 +312,8 @@ abstract class BaseMazePhysics(
         val touchedSlowDown = (inSlowDown(maze[topRow][leftCol],maze[bottomRow][rightCol]))
 
         if(touchedSlowDown){
-            velocityX = velocityX / 2
-            velocityY = velocityY / 2
+            velocityX = velocityX / 1.5f
+            velocityY = velocityY / 1.5f
         }
     }
 
@@ -346,8 +346,8 @@ abstract class BaseMazePhysics(
         val touchedSpeedUp = (inSpeedUp(maze[topRow][leftCol],maze[bottomRow][rightCol]))
 
         if(touchedSpeedUp){
-            velocityX *= 2
-            velocityY *= 2
+            velocityX *= 1.5f
+            velocityY *= 1.5f
         }
     }
 
