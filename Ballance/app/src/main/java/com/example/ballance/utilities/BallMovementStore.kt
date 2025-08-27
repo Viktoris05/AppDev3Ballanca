@@ -10,6 +10,10 @@ import java.io.FileOutputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 
+private const val size = 6000
+
+private const val resolution = 100
+
 /**
  * Stores the BEST ball movement until finish for each packaged level (1..10).
  * - Persistent across app restarts/updates (cleared on uninstall/clear data).*/
@@ -21,19 +25,19 @@ object BallMovementStore {
     private fun key(levelIndex: Int) = "best_ms_level_$levelIndex"
 
     /** True only for packaged levels we track. */
-    private fun isTrackableLevel(levelIndex: Int?) = levelIndex in 1..10
+    private fun isTrackableLevel(levelIndex: Int?) = levelIndex in 1..resolution
 
-    val movementStore:Array<Pair<Float, Float>?> = Array(60000){ null }
-    var bestMovement:Array<Pair<Float, Float>?> = Array(60000){ null }
+    val movementStore:Array<Pair<Float, Float>?> = Array(size){ null }
+    var bestMovement:Array<Pair<Float, Float>?> = Array(size){ null }
 
 
     fun addMovement(elapsedTime: Long, pos: Pair<Float, Float>){
-        movementStore[elapsedTime.toInt()/10] = pos
+        movementStore[elapsedTime.toInt()/ resolution] = pos
         Log.d("BallMovementStore", "Add with $elapsedTime: $pos")
     }
 
     fun getGhostMovement(elapsedTime: Long): Pair<Float, Float>? {
-        val pos = bestMovement[elapsedTime.toInt()/10]
+        val pos = bestMovement[elapsedTime.toInt()/ resolution]
         Log.d("BallMovementStore", "Load with $elapsedTime: $pos")
         return pos
     }
@@ -48,12 +52,12 @@ object BallMovementStore {
         val fileName = "BestTrackLevel$levelIndex"
         val file = File(context.filesDir, fileName)
         if(!file.exists()) {
-            bestMovement = Array(60000) {null}
+            bestMovement = Array(size) {null}
         }else {
             ObjectInputStream(FileInputStream(file)).use { ois ->
                 bestMovement = ois.readObject() as Array<Pair<Float, Float>?>
             }
-            for(i in 1..60000 - 1){
+            for(i in 1..size - 1){
                 if(bestMovement[i] == null){
                     bestMovement[i] = bestMovement[i - 1]
                 }
