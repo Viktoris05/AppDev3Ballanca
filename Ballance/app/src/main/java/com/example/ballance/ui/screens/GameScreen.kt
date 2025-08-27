@@ -22,6 +22,7 @@ import com.example.ballance.physics.CellBehavior
 import com.example.ballance.ui.navigation.Screen
 import com.example.ballance.ui.theme.accentColor
 import com.example.ballance.ui.theme.backgroundColor
+import com.example.ballance.utilities.BallMovementStore
 import com.example.ballance.viewModels.GameViewModel
 
 /**
@@ -164,6 +165,10 @@ fun GameScreen(
                     // This triggers recomposition and redraw of the ball on screen.
                     ballX = newX
                     ballY = newY
+
+                    //track latest ball movements
+                    BallMovementStore.addMovement(elapsedMs,Pair(ballX, ballY))
+
                     // Read latest velocity for debug display
                     velocityX = viewModel.getVelocityX()
                     velocityY = viewModel.getVelocityY()

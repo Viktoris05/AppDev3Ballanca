@@ -42,6 +42,7 @@ object LevelTimesStore {
 
         if (isNewRecord) {
             prefs(context).edit().putLong(key(levelIndex), candidateMs).apply()
+            BallMovementStore.record(context,levelIndex)
         }
         return isNewRecord
     }
