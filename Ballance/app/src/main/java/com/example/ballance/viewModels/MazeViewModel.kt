@@ -46,6 +46,16 @@ class MazeViewModel : ViewModel() {
      * Triggers recomposition for just that cell.
      */
     fun setCell(row: Int, col: Int, type: CellType) {
+        if (type == CellType.STARTINGTILE) {
+            // ensure only one STARTINGTILE exists: clear any other
+            for (r in 0 until rows) {
+                for (c in 0 until cols) {
+                    if ((r != row || c != col) && mazeGrid[r][c].value == CellType.STARTINGTILE) {
+                        mazeGrid[r][c].value = CellType.EMPTY
+                    }
+                }
+            }
+        }
         mazeGrid[row][col].value = type
     }
 
@@ -53,7 +63,7 @@ class MazeViewModel : ViewModel() {
      * Saves the current maze grid to local storage in JSON format.
      *
      * Converts the 2D grid of [MutableState<CellType>] into a serializable
-     * 2D list of [CellType]s and writes it to a file named `"maze.json"`.
+     * 2D list of [CellType]s and writes it to a file named `"custom_maze.json"`.
      *
      * @param context The Android [Context], used to open the file.
      */
@@ -62,7 +72,7 @@ class MazeViewModel : ViewModel() {
             row.map { it.value } // extract the raw CellType value from each MutableState
         }
         val jsonString = Json.Default.encodeToString(serializableGrid)
-        context.openFileOutput("maze.json", Context.MODE_PRIVATE).use {
+        context.openFileOutput("custom_maze.json", Context.MODE_PRIVATE).use {
             it.write(jsonString.toByteArray())
         }
     }
@@ -77,7 +87,7 @@ class MazeViewModel : ViewModel() {
      */
     fun loadMaze(context: Context) {
         try {
-            val jsonString = context.openFileInput("maze.json").bufferedReader().readText()
+            val jsonString = context.openFileInput("custom_maze.json").bufferedReader().readText()
             val loaded: List<List<CellType>> = Json.Default.decodeFromString(jsonString)
 
             for (r in 0 until rows) {

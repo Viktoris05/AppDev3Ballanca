@@ -1,5 +1,6 @@
 package com.example.ballance.ui.screens
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -26,6 +27,8 @@ import com.example.ballance.physics.CellType
 import com.example.ballance.viewModels.MazeViewModel
 import com.example.ballance.MusicPlayer
 import com.example.ballance.ui.theme.*
+import com.example.ballance.ui.navigation.Screen
+import com.example.ballance.utilities.LevelSession
 
 @Composable
 fun EditorScreen(
@@ -55,7 +58,7 @@ fun EditorScreen(
                     Icon(Icons.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
                 }
 
-                // save/load buttons now in the top bar, back to menu redundant
+                // save/load + play in the top bar
                 Row(
                     modifier = Modifier.weight(1f),
                     horizontalArrangement = Arrangement.Center,
@@ -84,6 +87,31 @@ fun EditorScreen(
                             contentColor = Color.White
                         )
                     ) { Text("Load Maze") }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Button(
+                        onClick = {
+                            // Always save latest edits into custom_maze.json
+                            viewModel.saveMaze(context)
+                            // Copy custom_maze.json -> maze.json (runtime file GameScreen uses)
+                            try {
+                                val custom = context.openFileInput("custom_maze.json").bufferedReader().readText()
+                                context.openFileOutput("maze.json", Context.MODE_PRIVATE).use {
+                                    it.write(custom.toByteArray())
+                                }
+                                // Mark "custom" (not one of the 10 packaged)
+                                LevelSession.currentLevelIndex = null
+                                navController.navigate(Screen.Game.route)
+                            } catch (e: Exception) {
+                                Toast.makeText(context, "Please save your level first.", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = accentColor,
+                            contentColor = Color.White
+                        )
+                    ) { Text("Play") }
                 }
 
                 IconButton(
@@ -163,6 +191,15 @@ fun EditorScreen(
                         )
                     ) {
                         Text("Red Wall")
+                    }
+                    Button(
+                        onClick = { selectedType = CellType.STARTINGTILE },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if(selectedType == CellType.STARTINGTILE) accentColorSelected else accentColor,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Start")
                     }
                 }
 
