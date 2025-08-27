@@ -94,9 +94,13 @@ fun GameScreen(
     var ballX by remember { mutableStateOf(viewModel.ballX) }
     var ballY by remember { mutableStateOf(viewModel.ballY) }
     var isPaused by remember { mutableStateOf(false) }
+    var outOfTime by remember { mutableStateOf(false) }
 
     // timer UI state
     var elapsedMs by remember { mutableStateOf(0L) }
+
+    //Timer start so the Array that tracks ball movement doesn't run out
+    var timer by remember {mutableStateOf(0L)} //10 minutes in ms = 6000
 
     // pause/resume the timer when pause state changes
     LaunchedEffect(isPaused) {
@@ -139,6 +143,12 @@ fun GameScreen(
 
                 // update timer label every frame (pause-aware via the ViewModel)
                 elapsedMs = viewModel.getElapsedMillis()
+                timer = 600000 - elapsedMs
+
+                if(timer <= 0){
+                    isPaused = true
+                    outOfTime = true
+                }
 
                 if(!isPaused) {
                     // Step the physics simulation with the tilt input and time delta.
@@ -172,7 +182,7 @@ fun GameScreen(
                 cellSize = cellSize
             )
 
-            if(isPaused){
+            if(isPaused || outOfTime){
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -202,6 +212,11 @@ fun GameScreen(
                             )
                         }
 
+                        // Text that says the time ran out
+                        if(outOfTime){
+                            Text("Time run out! Restart or exit to main menu")
+                        }
+
                         // Level name in pause menu
                         Text("Level ${viewModel.getNameForCurrent()}", color = Color.White)
 
@@ -210,17 +225,23 @@ fun GameScreen(
                         Text("Highscore: ${best?.let { formatTime(it) } ?: "--:--.---"}", color = Color.White)
                         Text("Current Score: ${formatTime(elapsedMs)}", color = Color.White)
 
-                        //Resume button
-                        Button(onClick = {isPaused = false},
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = accentColor,
-                                contentColor = Color.White)) {
-                            Text("Resume")
+                        if(!outOfTime) {
+                            //Resume button
+                            Button(
+                                onClick = { isPaused = false },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = accentColor,
+                                    contentColor = Color.White
+                                )
+                            ) {
+                                Text("Resume")
+                            }
                         }
 
                         //Restart Level
                         Button(onClick = {
                             isPaused = false
+                            outOfTime = false
                             viewModel.loadMaze()
                         },
                             colors = ButtonDefaults.buttonColors(
@@ -251,20 +272,36 @@ fun GameScreen(
                 verticalArrangement = Arrangement.Top
             ) {
 
-                //Pause/Resume Button
-                Button(
-                    onClick = {if(!isPaused) {isPaused = true}else{isPaused = false} },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = accentColor,
-                        contentColor = Color.White
-                    ),
-                    modifier = Modifier.padding(16.dp))
-                {
-                    Text(if(!isPaused){("II")}else{("▶")})
+                if(!outOfTime) {
+                    //Pause/Resume Button
+                    Button(
+                        onClick = {
+                            if (!isPaused) {
+                                isPaused = true
+                            } else {
+                                isPaused = false
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = accentColor,
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier.padding(16.dp)
+                    )
+                    {
+                        Text(
+                            if (!isPaused) {
+                                ("II")
+                            } else {
+                                ("▶")
+                            }
+                        )
+                    }
                 }
 
                 // live timer on HUD
                 Text("time: ${formatTime(elapsedMs)}", color = Color.White, fontSize = 16.sp)
+                Text("Time remaining: ${formatTime(timer)}", color = Color.White, fontSize = 16.sp)
 
                 //debug values on screen
                 fun Float.format(digits: Int): String = "%.${digits}f".format(this)
