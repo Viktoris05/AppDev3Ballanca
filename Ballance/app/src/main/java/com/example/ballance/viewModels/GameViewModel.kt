@@ -64,8 +64,34 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         // Initialize ball state and physics engine
         val cellSize = 66f
         physics = TiltGravityPhysics(ballRadius = cellSize / 2.5f)
-        ballX = cellSize * (maze[0].size / 2)
-        ballY = cellSize * (maze.size / 2)
+
+        // place ball on STARTINGTILE if present; otherwise center using the variables in BaseMazePhysics.kt
+        var startRow = -1
+        var startCol = -1
+        // loop with a found flag to exit both loops
+        var found = false
+        for (r in maze.indices) {
+            for (c in maze[0].indices) {
+                if (maze[r][c] == CellType.STARTINGTILE) {
+                    startRow = r; startCol = c; found = true
+                    break
+                }
+            }
+            if (found) break
+        }
+        if (startRow >= 0 && startCol >= 0) {
+            val spawnX = (startCol + 0.5f) * cellSize
+            val spawnY = (startRow + 0.5f) * cellSize
+            ballX = spawnX
+            ballY = spawnY
+            physics.setRespawn(spawnX, spawnY)
+        } else {
+            val centerX = cellSize * (maze[0].size / 2)
+            val centerY = cellSize * (maze.size / 2)
+            ballX = centerX
+            ballY = centerY
+            physics.setRespawn(centerX, centerY)
+        }
 
         // Reset run timer for the (re)loaded level; GameScreen resumes it when unpaused.
         resetTimer()
