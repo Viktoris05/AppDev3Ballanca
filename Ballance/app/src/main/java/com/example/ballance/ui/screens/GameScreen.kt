@@ -1,10 +1,8 @@
 package com.example.ballance.ui.screens
-import android.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.*
@@ -66,6 +64,9 @@ fun GameScreen(
         if (navigated) return@rememberUpdatedState
         navigated = true
 
+        // record time & best before leaving
+        viewModel.markVictory()
+
         //hard stop the game and sensors before navigating to prevent it running in the background
         gameActive = false
         sensorHandler.unregister()
@@ -92,7 +93,23 @@ fun GameScreen(
     // Track ball position in world-space pixels (stateful for Compose redraw)
     var ballX by remember { mutableStateOf(viewModel.ballX) }
     var ballY by remember { mutableStateOf(viewModel.ballY) }
-    var isPaused by remember {mutableStateOf(false)}
+    var isPaused by remember { mutableStateOf(false) }
+
+    // timer UI state
+    var elapsedMs by remember { mutableStateOf(0L) }
+
+    // pause/resume the timer when pause state changes
+    LaunchedEffect(isPaused) {
+        if (isPaused) viewModel.pauseTimer() else viewModel.resumeTimer()
+    }
+
+    // small helper for formatting time
+    fun formatTime(ms: Long): String {
+        val m = ms / 60000
+        val s = (ms % 60000) / 1000
+        val ms3 = ms % 1000
+        return "%d:%02d.%03d".format(m, s, ms3)
+    }
 
     // Launch a coroutine that starts when this Composable is composed.
     // This will run our real-time physics update loop (60fps-like).
@@ -120,6 +137,9 @@ fun GameScreen(
                 val ax = sensorHandler.tiltX
                 val ay = sensorHandler.tiltY
 
+                // update timer label every frame (pause-aware via the ViewModel)
+                elapsedMs = viewModel.getElapsedMillis()
+
                 if(!isPaused) {
                     // Step the physics simulation with the tilt input and time delta.
                     // The ViewModel runs the physics and gives us the updated position.
@@ -143,114 +163,119 @@ fun GameScreen(
     }
 
     Surface(modifier = Modifier.fillMaxSize(), color = backgroundColor) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                // Maze and ball rendering
-                GameCanvas(
-                    maze = maze,
-                    ballX = ballX,
-                    ballY = ballY,
-                    cellSize = cellSize
-                )
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Maze and ball rendering
+            GameCanvas(
+                maze = maze,
+                ballX = ballX,
+                ballY = ballY,
+                cellSize = cellSize
+            )
 
-                if(isPaused){
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.Black.copy(alpha = 0.7f)), //make background more dim
-                        contentAlignment = Alignment.Center
-                    ){
-                        Column(
-                            modifier = Modifier
-                                .background(backgroundColor)
-                                .padding(24.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(16.dp))
-                            {
-                                //Music toggle
-                                IconButton(
-                                    onClick = {
-                                        MusicPlayer.toggle(context)
-                                        isPlaying = MusicPlayer.isPlaying
-                                    },
-                                    modifier = Modifier.size(15.dp).align(Alignment.End)
-                                ) {
-                                    Icon(
-                                        imageVector = if (isPlaying) Icons.Filled.VolumeUp else Icons.Filled.VolumeOff,
-                                        contentDescription = "Musik umschalten",
-                                        tint = Color.White,
-                                        modifier = Modifier.fillMaxSize()
-                                    )
-                                }
-
-                                Text("Level: (Name)", color = Color.White)
-                                Text("Highscore: (Time)", color = Color.White)
-                                Text("Current Score: (Time)", color = Color.White)
-
-                                //Resume button
-                                Button(onClick = {isPaused = false},
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = accentColor,
-                                        contentColor = Color.White)) {
-                                    Text("Resume")
-                                }
-
-
-                                //Restart Level
-                                Button(onClick = {
-                                    isPaused = false
-                                    viewModel.loadMaze()
-                                                 },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = accentColor,
-                                        contentColor = Color.White
-                                    )) {
-                                    Text("Restart level")
-                                }
-
-                                //Back to Menu
-                                Button(onClick = { navController.popBackStack() },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = accentColor,
-                                        contentColor = Color.White
-                                    )) {
-                                    Text("Back to Menu")
-                                }
-                            }
-                    }
-                }
-
-                // Debug overlay in upper-right
-                Column(
+            if(isPaused){
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.End,
-                    verticalArrangement = Arrangement.Top
-                ) {
-
-                    //Pause/Resume Button
-                    Button(
-                        onClick = {if(!isPaused) {isPaused = true}else{isPaused = false} },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = accentColor,
-                            contentColor = Color.White
-                        ),
-                        modifier = Modifier.padding(16.dp))
+                        .background(Color.Black.copy(alpha = 0.7f)), //make background more dim
+                    contentAlignment = Alignment.Center
+                ){
+                    Column(
+                        modifier = Modifier
+                            .background(backgroundColor)
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp))
                     {
-                        Text(if(!isPaused){("II")}else{("▶")})
+                        //Music toggle
+                        IconButton(
+                            onClick = {
+                                MusicPlayer.toggle(context)
+                                isPlaying = MusicPlayer.isPlaying
+                            },
+                            modifier = Modifier.size(15.dp).align(Alignment.End)
+                        ) {
+                            Icon(
+                                imageVector = if (isPlaying) Icons.Filled.VolumeUp else Icons.Filled.VolumeOff,
+                                contentDescription = "Musik umschalten",
+                                tint = Color.White,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+
+                        Text("Level: (Name)", color = Color.White)
+
+                        // best + current time in pause menu
+                        val best = viewModel.getBestTimeForCurrent()
+                        Text("Highscore: ${best?.let { formatTime(it) } ?: "--:--.---"}", color = Color.White)
+                        Text("Current Score: ${formatTime(elapsedMs)}", color = Color.White)
+
+                        //Resume button
+                        Button(onClick = {isPaused = false},
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = accentColor,
+                                contentColor = Color.White)) {
+                            Text("Resume")
+                        }
+
+                        //Restart Level
+                        Button(onClick = {
+                            isPaused = false
+                            viewModel.loadMaze()
+                        },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = accentColor,
+                                contentColor = Color.White
+                            )) {
+                            Text("Restart level")
+                        }
+
+                        //Back to Menu
+                        Button(onClick = { navController.popBackStack() },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = accentColor,
+                                contentColor = Color.White
+                            )) {
+                            Text("Back to Menu")
+                        }
                     }
+                }
+            }
 
-                    //debug values on screen
-                    fun Float.format(digits: Int): String = "%.${digits}f".format(this)
+            // Debug overlay in upper-right
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.Top
+            ) {
 
-                    Text("ax: ${sensorHandler.tiltX.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
-                    Text("ay: ${sensorHandler.tiltY.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
-                    Text("vx: ${velocityX.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
-                    Text("vy: ${velocityY.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
-                    Text("xcor: ${ballX.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
-                    Text("ycor: ${ballY.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+                //Pause/Resume Button
+                Button(
+                    onClick = {if(!isPaused) {isPaused = true}else{isPaused = false} },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = accentColor,
+                        contentColor = Color.White
+                    ),
+                    modifier = Modifier.padding(16.dp))
+                {
+                    Text(if(!isPaused){("II")}else{("▶")})
                 }
 
+                // live timer on HUD
+                Text("time: ${formatTime(elapsedMs)}", color = Color.White, fontSize = 16.sp)
+
+                //debug values on screen
+                fun Float.format(digits: Int): String = "%.${digits}f".format(this)
+
+                Text("ax: ${sensorHandler.tiltX.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+                Text("ay: ${sensorHandler.tiltY.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+                Text("vx: ${velocityX.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+                Text("vy: ${velocityY.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+                Text("xcor: ${ballX.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+                Text("ycor: ${ballY.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
             }
+
+        }
     }
 }

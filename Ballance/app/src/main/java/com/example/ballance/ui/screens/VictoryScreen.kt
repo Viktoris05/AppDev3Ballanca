@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.ButtonDefaults
@@ -20,11 +19,26 @@ import androidx.navigation.NavController
 import com.example.ballance.MusicPlayer
 import com.example.ballance.ui.navigation.Screen
 import com.example.ballance.ui.theme.*
+import com.example.ballance.utilities.LevelSession
+import com.example.ballance.utilities.LevelTimesStore
 
 @Composable
 fun VictoryScreen(navController: NavController) {
     val context = LocalContext.current
     var isPlaying by remember { mutableStateOf(MusicPlayer.isPlaying) }
+
+    // Zeiten holen
+    val levelIndex = LevelSession.currentLevelIndex
+    val lastRunMs = LevelSession.lastRunMillis
+    val bestMs = remember(levelIndex) {
+        if (levelIndex != null) LevelTimesStore.getBestTime(context, levelIndex) else null
+    }
+    fun format(ms: Long): String {
+        val m = ms / 60000
+        val s = (ms % 60000) / 1000
+        val ms3 = ms % 1000
+        return "%d:%02d.%03d".format(m, s, ms3)
+    }
 
     val gradient = Brush.verticalGradient(
         colors = listOf(
@@ -77,6 +91,21 @@ fun VictoryScreen(navController: NavController) {
                         color = Color.White
                     )
                     Spacer(modifier = Modifier.height(24.dp))
+
+                    // Zeiten anzeigen
+                    Text(
+                        text = "Your time: ${format(lastRunMs)}",
+                        fontSize = 18.sp,
+                        color = Color.White
+                    )
+                    if (levelIndex != null) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Best: ${bestMs?.let { format(it) } ?: "--:--.---"}",
+                            fontSize = 16.sp,
+                            color = Color.White.copy(alpha = 0.9f)
+                        )
+                    }
                 }
 
                 // Weiter / Zurück-Buttons
@@ -102,12 +131,13 @@ fun VictoryScreen(navController: NavController) {
                     Button(
                         onClick = {
                             navController.popBackStack() //lösche die vorherige Instanz
-                            navController.navigate(Screen.Game.route) },
+                            navController.navigate(Screen.Game.route)
+                        },
                         modifier = Modifier.fillMaxWidth(0.8f),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = accentColor,
                             contentColor = Color.White
-                    )
+                        )
                     ) {
                         Text("Nochmal spielen")
                     }

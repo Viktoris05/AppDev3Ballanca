@@ -24,6 +24,7 @@ import com.example.ballance.physics.CellType
 import com.example.ballance.ui.navigation.Screen
 import com.example.ballance.ui.theme.*
 import com.example.ballance.utilities.LevelPack
+import com.example.ballance.utilities.LevelSession
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -87,7 +88,10 @@ fun LevelSelectScreen(navController: NavController) {
                         verticalPadding = buttonVerticalPadding,
                         textSize = buttonTextSize
                     ) {
-                        // Load packaged level, save to the same file GameViewModel reads, then navigate basically to assure custom made levels work
+                        // Remember which packaged level we're playing
+                        LevelSession.currentLevelIndex = entry.index
+
+                        // Load packaged level, save to the same file GameViewModel reads, then navigate
                         val data: List<List<CellType>> = LevelPack.load(context, entry.index)
                         val jsonString = Json.Default.encodeToString(data)
                         context.openFileOutput("maze.json", Context.MODE_PRIVATE).use {
