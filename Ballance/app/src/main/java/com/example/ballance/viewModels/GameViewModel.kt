@@ -200,4 +200,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             LevelTimesStore.getBestTime(context, idx)
         } else null
     }
+
+    /** For pause UI: returns Level Number as a String, or returns "Custom" for custom levels*/
+    fun getNameForCurrent(): String? {
+        val idx = LevelSession.currentLevelIndex
+        if(idx != null && idx in 1 .. 10){
+            return "$idx"
+        }else{
+            return ": Custom"
+        }
+    }
 }

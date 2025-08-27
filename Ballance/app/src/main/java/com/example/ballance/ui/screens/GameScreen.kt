@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.ballance.ui.screens.utilities.GameCanvas
 import com.example.ballance.MusicPlayer
-import com.example.ballance.Utilities.TiltSensorHandler
+import com.example.ballance.utilities.TiltSensorHandler
 import com.example.ballance.physics.CellBehavior
 import com.example.ballance.ui.navigation.Screen
 import com.example.ballance.ui.theme.accentColor
@@ -202,7 +202,8 @@ fun GameScreen(
                             )
                         }
 
-                        Text("Level: (Name)", color = Color.White)
+                        // Level name in pause menu
+                        Text("Level ${viewModel.getNameForCurrent()}", color = Color.White)
 
                         // best + current time in pause menu
                         val best = viewModel.getBestTimeForCurrent()
