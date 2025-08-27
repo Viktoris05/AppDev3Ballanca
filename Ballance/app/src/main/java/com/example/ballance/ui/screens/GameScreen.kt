@@ -17,11 +17,12 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.ballance.ui.screens.utilities.GameCanvas
 import com.example.ballance.MusicPlayer
-import com.example.ballance.Utilities.TiltSensorHandler
+import com.example.ballance.utilities.TiltSensorHandler
 import com.example.ballance.physics.CellBehavior
 import com.example.ballance.ui.navigation.Screen
 import com.example.ballance.ui.theme.accentColor
 import com.example.ballance.ui.theme.backgroundColor
+import com.example.ballance.utilities.BallMovementStore
 import com.example.ballance.viewModels.GameViewModel
 
 /**
@@ -93,10 +94,16 @@ fun GameScreen(
     // Track ball position in world-space pixels (stateful for Compose redraw)
     var ballX by remember { mutableStateOf(viewModel.ballX) }
     var ballY by remember { mutableStateOf(viewModel.ballY) }
+    var ghostX by remember { mutableStateOf(0f) }
+    var ghostY by remember { mutableStateOf(0f) }
     var isPaused by remember { mutableStateOf(false) }
+    var outOfTime by remember { mutableStateOf(false) }
 
     // timer UI state
     var elapsedMs by remember { mutableStateOf(0L) }
+
+    //Timer start so the Array that tracks ball movement doesn't run out
+    var timer by remember {mutableStateOf(0L)} //10 minutes in ms = 6000
 
     // pause/resume the timer when pause state changes
     LaunchedEffect(isPaused) {
@@ -139,6 +146,12 @@ fun GameScreen(
 
                 // update timer label every frame (pause-aware via the ViewModel)
                 elapsedMs = viewModel.getElapsedMillis()
+                timer = 600000 - elapsedMs
+
+                if(timer <= 0){
+                    isPaused = true
+                    outOfTime = true
+                }
 
                 if(!isPaused) {
                     // Step the physics simulation with the tilt input and time delta.
@@ -154,6 +167,17 @@ fun GameScreen(
                     // This triggers recomposition and redraw of the ball on screen.
                     ballX = newX
                     ballY = newY
+
+                    val newGhostPos = BallMovementStore.getGhostMovement(elapsedMs)
+
+                    if(newGhostPos != null){
+                        ghostX = newGhostPos.first
+                        ghostY = newGhostPos.second
+                    }
+
+                    //track latest ball movements
+                    BallMovementStore.addMovement(elapsedMs,Pair(ballX, ballY))
+
                     // Read latest velocity for debug display
                     velocityX = viewModel.getVelocityX()
                     velocityY = viewModel.getVelocityY()
@@ -169,10 +193,12 @@ fun GameScreen(
                 maze = maze,
                 ballX = ballX,
                 ballY = ballY,
+                ghostX = ghostX,
+                ghostY = ghostY,
                 cellSize = cellSize
             )
 
-            if(isPaused){
+            if(isPaused || outOfTime){
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -202,24 +228,36 @@ fun GameScreen(
                             )
                         }
 
-                        Text("Level: (Name)", color = Color.White)
+                        // Text that says the time ran out
+                        if(outOfTime){
+                            Text("Time run out! Restart or exit to main menu")
+                        }
+
+                        // Level name in pause menu
+                        Text("Level ${viewModel.getNameForCurrent()}", color = Color.White)
 
                         // best + current time in pause menu
                         val best = viewModel.getBestTimeForCurrent()
                         Text("Highscore: ${best?.let { formatTime(it) } ?: "--:--.---"}", color = Color.White)
                         Text("Current Score: ${formatTime(elapsedMs)}", color = Color.White)
 
-                        //Resume button
-                        Button(onClick = {isPaused = false},
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = accentColor,
-                                contentColor = Color.White)) {
-                            Text("Resume")
+                        if(!outOfTime) {
+                            //Resume button
+                            Button(
+                                onClick = { isPaused = false },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = accentColor,
+                                    contentColor = Color.White
+                                )
+                            ) {
+                                Text("Resume")
+                            }
                         }
 
                         //Restart Level
                         Button(onClick = {
                             isPaused = false
+                            outOfTime = false
                             viewModel.loadMaze()
                         },
                             colors = ButtonDefaults.buttonColors(
@@ -250,30 +288,46 @@ fun GameScreen(
                 verticalArrangement = Arrangement.Top
             ) {
 
-                //Pause/Resume Button
-                Button(
-                    onClick = {if(!isPaused) {isPaused = true}else{isPaused = false} },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = accentColor,
-                        contentColor = Color.White
-                    ),
-                    modifier = Modifier.padding(16.dp))
-                {
-                    Text(if(!isPaused){("II")}else{("▶")})
+                if(!outOfTime) {
+                    //Pause/Resume Button
+                    Button(
+                        onClick = {
+                            if (!isPaused) {
+                                isPaused = true
+                            } else {
+                                isPaused = false
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = accentColor,
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier.padding(16.dp)
+                    )
+                    {
+                        Text(
+                            if (!isPaused) {
+                                ("II")
+                            } else {
+                                ("▶")
+                            }
+                        )
+                    }
                 }
 
                 // live timer on HUD
                 Text("time: ${formatTime(elapsedMs)}", color = Color.White, fontSize = 16.sp)
+                Text("Time remaining: ${formatTime(timer)}", color = Color.White, fontSize = 16.sp)
 
                 //debug values on screen
                 fun Float.format(digits: Int): String = "%.${digits}f".format(this)
-
-                Text("ax: ${sensorHandler.tiltX.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
-                Text("ay: ${sensorHandler.tiltY.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
-                Text("vx: ${velocityX.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
-                Text("vy: ${velocityY.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
-                Text("xcor: ${ballX.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
-                Text("ycor: ${ballY.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+                    //remove debug
+//                Text("ax: ${sensorHandler.tiltX.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+//                Text("ay: ${sensorHandler.tiltY.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+//                Text("vx: ${velocityX.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+//                Text("vy: ${velocityY.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+//                Text("xcor: ${ballX.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
+//                Text("ycor: ${ballY.format(2)}", color = Color.DarkGray, fontSize = 14.sp)
             }
 
         }

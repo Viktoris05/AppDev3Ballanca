@@ -28,6 +28,7 @@ import com.example.ballance.viewModels.MazeViewModel
 import com.example.ballance.MusicPlayer
 import com.example.ballance.ui.theme.*
 import com.example.ballance.ui.navigation.Screen
+import com.example.ballance.utilities.BallMovementStore
 import com.example.ballance.utilities.LevelSession
 
 @Composable
@@ -102,6 +103,7 @@ fun EditorScreen(
                                 }
                                 // Mark "custom" (not one of the 10 packaged)
                                 LevelSession.currentLevelIndex = null
+                                BallMovementStore.loadBestMovement(context,null)
                                 navController.navigate(Screen.Game.route)
                             } catch (e: Exception) {
                                 Toast.makeText(context, "Please save your level first.", Toast.LENGTH_SHORT).show()
